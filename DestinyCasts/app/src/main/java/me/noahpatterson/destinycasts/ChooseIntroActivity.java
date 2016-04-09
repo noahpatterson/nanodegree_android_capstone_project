@@ -46,6 +46,10 @@ public class ChooseIntroActivity extends AppCompatActivity {
     }
 
     private Podcast[] podcastsList = {
-            new Podcast("Destiny The Show", R.drawable.destiny_the_show, "http://destinytheshow.podbean.com/feed/")
+            new Podcast("Destiny The Show", R.drawable.destiny_the_show, "http://destinytheshow.podbean.com/feed/"),
+            new Podcast("Destiny Ghost Stories", R.drawable.destiny_ghost_stories, "http://destinyghoststories.podbean.com/feed/"),
+            new Podcast("Fireteam Chat", R.drawable.fireteam_chat, "http://feeds.feedburner.com/FireteamChatIgnsDestinyPodcast"),
+            new Podcast("Guardian Radio", R.drawable.guardian_radio, "http://theguardiansofdestiny.com/feed/podcast/"),
+            new Podcast("Crucible Radio", R.drawable.crucible_radio, "http://feeds.feedburner.com/CrucibleRadio")
     };
 }
