@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">DestinyCasts</string>
+    <string name="action_settings">Choose Podcasts</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="choose_your_favorite_podcasts">Choose your favorite podcasts</string>
+    <string name="choose_select_all">Select all</string>
+    <string name="choose_continue">Continue</string>
+</resources>
