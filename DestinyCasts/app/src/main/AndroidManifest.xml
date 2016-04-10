@@ -24,7 +24,13 @@
 
         <service
             android:name=".FetchPodcastFeedsIntentService"
-            android:exported="false"></service>
+            android:exported="false"/>
+
+        <provider
+            android:authorities="@string/content_authority"
+            android:name=".data.PodcastsProvider"
+            android:exported="false"
+            android:syncable="true"/>
     </application>
 
 </manifest>
