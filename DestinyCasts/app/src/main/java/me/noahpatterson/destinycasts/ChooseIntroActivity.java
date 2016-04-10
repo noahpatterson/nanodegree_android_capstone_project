@@ -1,31 +1,35 @@
 package me.noahpatterson.destinycasts;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 
-import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
+
+import me.noahpatterson.destinycasts.model.Podcast;
 
 public class ChooseIntroActivity extends AppCompatActivity {
+
+    private GridView podcastGridView;
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_intro);
+//        rootView = getLayoutInflater().inflate(R.layout.activity_choose_intro,null);
 
-        GridView podcastGridView = (GridView) findViewById(R.id.podcastGridView);
-        podcastGridView.setAdapter(new PodcastChooseArrayAdapter(this, Arrays.asList(podcastsList)));
+        podcastGridView = (GridView) findViewById(R.id.podcastGridView);
+        podcastGridView.setAdapter(new PodcastChooseArrayAdapter(this, Arrays.asList(Utilities.podcastsList)));
+
+
     }
 
     public void finishOnboarding(View view) {
@@ -45,11 +49,15 @@ public class ChooseIntroActivity extends AppCompatActivity {
         finish();
     }
 
-    private Podcast[] podcastsList = {
-            new Podcast("Destiny The Show", R.drawable.destiny_the_show, "http://destinytheshow.podbean.com/feed/"),
-            new Podcast("Destiny Ghost Stories", R.drawable.destiny_ghost_stories, "http://destinyghoststories.podbean.com/feed/"),
-            new Podcast("Fireteam Chat", R.drawable.fireteam_chat, "http://feeds.feedburner.com/FireteamChatIgnsDestinyPodcast"),
-            new Podcast("Guardian Radio", R.drawable.guardian_radio, "http://theguardiansofdestiny.com/feed/podcast/"),
-            new Podcast("Crucible Radio", R.drawable.crucible_radio, "http://feeds.feedburner.com/CrucibleRadio")
-    };
+    public void selectAllPodcasts(View view) {
+        int count = podcastGridView.getChildCount();
+//        View podcastItemView = LayoutInflater.from(this).inflate(R.layout.podcast_list_view, podcastGridView, false);
+        PodcastChooseArrayAdapter podcastAdapter = (PodcastChooseArrayAdapter) podcastGridView.getAdapter();
+        for(int i = 0;i  < count;i++) {
+//           View podcastItem = podcastAdapter.getView(i,podcastItemView, podcastGridView);
+//            podcastItem.setSelected(true);
+            podcastAdapter.getItem(i).isSelected = true;
+        }
+        podcastAdapter.notifyDataSetChanged();
+    }
 }

@@ -23,7 +23,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/choose_select_all"/>
+            android:text="@string/choose_select_all"
+            android:onClick="selectAllPodcasts"/>
 
         <Button
             android:id="@+id/continueButton"
