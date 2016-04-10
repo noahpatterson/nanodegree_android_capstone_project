@@ -19,9 +19,15 @@ import me.noahpatterson.destinycasts.model.Podcast;
  */
 public class PodcastChooseArrayAdapter extends ArrayAdapter<Podcast> {
     private Context mContext;
+    List<Podcast> podcastList;
     public PodcastChooseArrayAdapter(Context context, List<Podcast> podcastList) {
         super(context, 0, podcastList);
         mContext = context;
+        this.podcastList = podcastList;
+    }
+
+    public List<Podcast> getAllItems() {
+        return podcastList;
     }
 
     @Override

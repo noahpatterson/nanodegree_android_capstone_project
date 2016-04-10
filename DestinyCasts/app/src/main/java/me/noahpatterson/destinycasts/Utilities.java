@@ -9,16 +9,11 @@ import me.noahpatterson.destinycasts.model.Podcast;
  */
 public class Utilities {
     public static void setImageSelected(View imageView, Podcast podcast) {
-//        boolean selected = imageView.isSelected();
         boolean selected = podcast.isSelected;
         if (selected) {
             imageView.setAlpha(0.5f);
-//            imageView.setSelected(true);
-//            podcast.isSelected = true;
         } else {
             imageView.setAlpha(1.0f);
-//            imageView.setSelected(false);
-//            podcast.isSelected = false;
         }
     }
 
