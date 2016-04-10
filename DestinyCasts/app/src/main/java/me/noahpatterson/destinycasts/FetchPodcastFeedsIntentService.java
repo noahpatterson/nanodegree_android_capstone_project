@@ -5,8 +5,18 @@ import android.content.Intent;
 import android.content.Context;
 import android.util.Log;
 
-import java.io.IOException;
+import com.einmalfel.earl.EarlParser;
+import com.einmalfel.earl.Feed;
+import com.einmalfel.earl.Item;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.DataFormatException;
+
+import me.noahpatterson.destinycasts.model.Podcast;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -40,10 +50,21 @@ public class FetchPodcastFeedsIntentService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionFetchNew(Context context, String feedUrlParam) {
+    public static void startActionFetchNew(Context context, List<Podcast> podcastList) {
+        //pull out only podcast favorite urls
+        ArrayList<String> favorites = new ArrayList<>();
+        int favoriteLength = 0;
+        for(int i =0;i < podcastList.size();i++) {
+            Podcast podcast = podcastList.get(i);
+            if (podcast.isSelected) {
+                favorites.add(favoriteLength, podcast.rssFeedUrlString);
+                favoriteLength++;
+            }
+        }
+
         Intent intent = new Intent(context, FetchPodcastFeedsIntentService.class);
         intent.setAction(ACTION_FETCH_NEW_FEED_ITEMS);
-        intent.putExtra(FEED_URL_PARAM, feedUrlParam);
+        intent.putExtra(FEED_URL_PARAM, favorites.get(0));
 //        intent.putExtra(EXTRA_PARAM2, param2);
         context.startService(intent);
     }
@@ -94,9 +115,19 @@ public class FetchPodcastFeedsIntentService extends IntentService {
                     .build();
 
             Response response = client.newCall(request).execute();
-            Log.d(LOG_TAG, response.body().string());
+//            Log.d(LOG_TAG, response.body().string());
+            Feed feed = EarlParser.parseOrThrow(response.body().byteStream(), 0);
+            Log.i(LOG_TAG, "Processing feed: " + feed.getTitle());
+            for (Item item : feed.getItems()) {
+                String title = item.getTitle();
+                Log.i(LOG_TAG, "Item title: " + (title == null ? "N/A" : title));
+            }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
+        } catch (XmlPullParserException e) {
+            Log.e(LOG_TAG, "xmlPullParserException ", e);
+        } catch (DataFormatException e) {
+            Log.e(LOG_TAG, "DataFormatException ", e);
         }
 
 

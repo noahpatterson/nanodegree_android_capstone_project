@@ -84,7 +84,7 @@ public class WeeklyListActivity extends AppCompatActivity {
 //            }
 //        });
 
-        FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList.get(0).rssFeedUrlString);
+        FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
 
     }
 
