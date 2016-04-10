@@ -1,6 +1,14 @@
 package me.noahpatterson.destinycasts;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.view.View;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.List;
 
 import me.noahpatterson.destinycasts.model.Podcast;
 
@@ -35,4 +43,12 @@ public class Utilities {
             new Podcast("Guardian Radio", R.drawable.guardian_radio, "http://theguardiansofdestiny.com/feed/podcast/"),
             new Podcast("Crucible Radio", R.drawable.crucible_radio, "http://feeds.feedburner.com/CrucibleRadio")
     };
+
+    @Nullable
+    public static List<Podcast> getPodcastsFavorites(Context context, SharedPreferences preferences) {
+        //grab list of saved podcast favorites
+        Gson gson = new Gson();
+        String jsonText = preferences.getString("podcast favorites", null);
+        return gson.fromJson(jsonText, new TypeToken<List<Podcast>>(){}.getType());
+    }
 }

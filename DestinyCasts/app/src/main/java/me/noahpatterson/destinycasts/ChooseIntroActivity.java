@@ -2,6 +2,7 @@ package me.noahpatterson.destinycasts;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -19,6 +20,7 @@ public class ChooseIntroActivity extends AppCompatActivity {
 
     private GridView podcastGridView;
     private PodcastChooseArrayAdapter podcastAdapter;
+    private SharedPreferences preferences;
 
     @Override
     protected void onStart() {
@@ -32,12 +34,12 @@ public class ChooseIntroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_intro);
 
-        //grab list of saved podcast favorites
-        SharedPreferences preferences =
+        // Get the shared preferences
+        preferences =
                 getSharedPreferences("my_preferences", MODE_PRIVATE);
-        Gson gson = new Gson();
-        String jsonText = preferences.getString("podcast favorites", null);
-        List<Podcast> podcastList = gson.fromJson(jsonText, new TypeToken<List<Podcast>>(){}.getType());
+
+        List<Podcast> podcastList = Utilities.getPodcastsFavorites(this, preferences);
+
 
         podcastGridView = (GridView) findViewById(R.id.podcastGridView);
 
@@ -55,10 +57,6 @@ public class ChooseIntroActivity extends AppCompatActivity {
     }
 
     public void finishOnboarding(View view) {
-        // Get the shared preferences
-        SharedPreferences preferences =
-                getSharedPreferences("my_preferences", MODE_PRIVATE);
-
         // Set onboarding_complete to true
         preferences.edit()
                 .putBoolean("onboarding_complete",true).apply();
@@ -99,8 +97,6 @@ public class ChooseIntroActivity extends AppCompatActivity {
         List podcastItems = podcastAdapter.getAllItems();
         Gson gson = new Gson();
         String jsonText = gson.toJson(podcastItems);
-        SharedPreferences preferences =
-                getSharedPreferences("my_preferences", MODE_PRIVATE);
         preferences.edit()
                 .putString("podcast favorites",jsonText).apply();
     }
