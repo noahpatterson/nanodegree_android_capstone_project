@@ -8,6 +8,8 @@ import android.util.Log;
 import com.einmalfel.earl.EarlParser;
 import com.einmalfel.earl.Feed;
 import com.einmalfel.earl.Item;
+import com.einmalfel.earl.RSSFeed;
+import com.einmalfel.earl.RSSItem;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -118,9 +120,16 @@ public class FetchPodcastFeedsIntentService extends IntentService {
 //            Log.d(LOG_TAG, response.body().string());
             Feed feed = EarlParser.parseOrThrow(response.body().byteStream(), 0);
             Log.i(LOG_TAG, "Processing feed: " + feed.getTitle());
+            Log.i(LOG_TAG, "podcast url: " + feed.getLink());
+            Log.i(LOG_TAG, "podcast subtitle: " + ((RSSFeed) feed).itunes.subtitle);
+            Log.i(LOG_TAG, "podcast summary: " + ((RSSFeed) feed).itunes.summary);
             for (Item item : feed.getItems()) {
                 String title = item.getTitle();
                 Log.i(LOG_TAG, "Item title: " + (title == null ? "N/A" : title));
+                Log.i(LOG_TAG, "item pubdate: " + ((RSSItem) item).pubDate);
+                Log.i(LOG_TAG, "item image: " + ((RSSItem) item).itunes.image);
+                Log.i(LOG_TAG, "item description: " + ((RSSItem) item).description);
+                Log.i(LOG_TAG, "item mp3: " + ((RSSItem) item).media.contents.get(0).url);
             }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
