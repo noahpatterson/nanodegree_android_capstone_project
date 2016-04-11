@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.facebook.stetho.Stetho;
+
 import java.util.List;
 
 import me.noahpatterson.destinycasts.model.Podcast;
@@ -46,6 +48,8 @@ public class WeeklyListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
         // Get the shared preferences
         SharedPreferences preferences =  getSharedPreferences("my_preferences", MODE_PRIVATE);
 
@@ -60,6 +64,18 @@ public class WeeklyListActivity extends AppCompatActivity {
         List<Podcast> podcastList = Utilities.getPodcastsFavorites(this, preferences);
 
         setContentView(R.layout.activity_weekly_list);
+        // Stetho is a tool created by facebook to view your database in chrome inspect.
+        // The code below integrates Stetho into your app. More information here:
+        // http://facebook.github.io/stetho/
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(this)
+                        .enableDumpapp(
+                                Stetho.defaultDumperPluginsProvider(this))
+                        .enableWebKitInspector(
+                                Stetho.defaultInspectorModulesProvider(this))
+                        .build());
+
+        ///////////////
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

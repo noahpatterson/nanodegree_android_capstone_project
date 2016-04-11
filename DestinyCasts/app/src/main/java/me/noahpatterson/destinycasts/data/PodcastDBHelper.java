@@ -13,7 +13,7 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
 
         //name & version
         private static final String DATABASE_NAME = "podcast.db";
-        private static final int DATABASE_VERSION = 1;
+        private static final int DATABASE_VERSION = 2;
 
         public PodcastDBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -31,9 +31,26 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
                     PodcastContract.PodcastEntry.COLUMN_PODCAST_URL +
                     " TEXT NOT NULL, " +
                     PodcastContract.PodcastEntry.COLUMN_SUBTITLE +
-                    " TEXT NOT NULL, ";
+                    " TEXT NOT NULL);";
+            final String SQL_CREATE_EPISODE_TABLE = "CREATE TABLE " +
+                    PodcastContract.EpisodeEntry.TABLE_EPISODE + "(" + PodcastContract.EpisodeEntry._ID +
+                    " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    PodcastContract.EpisodeEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
+                    PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION +
+                    " TEXT NOT NULL, " +
+                    PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL +
+                    " TEXT NOT NULL, " +
+                    PodcastContract.EpisodeEntry.COLUMN_PUB_DATE +
+                    " INTEGER NOT NULL, " +
+                    PodcastContract.EpisodeEntry.COLUMN_URL +
+                    " TEXT NOT NULL, " +
+                    PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID + " INTEGER NOT NULL, " +
+                    // Set up the location column as a foreign key to location table.
+                    " FOREIGN KEY (" + PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID + ") REFERENCES " +
+                    PodcastContract.PodcastEntry.TABLE_PODCAST + " (" + PodcastContract.PodcastEntry._ID + "))";
 
             sqLiteDatabase.execSQL(SQL_CREATE_PODCAST_TABLE);
+            sqLiteDatabase.execSQL(SQL_CREATE_EPISODE_TABLE);
         }
 
         // Upgrade database when version is changed.
@@ -45,6 +62,10 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PodcastContract.PodcastEntry.TABLE_PODCAST);
             sqLiteDatabase.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
                     PodcastContract.PodcastEntry.TABLE_PODCAST + "'");
+
+            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PodcastContract.EpisodeEntry.TABLE_EPISODE);
+            sqLiteDatabase.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                    PodcastContract.EpisodeEntry.TABLE_EPISODE + "'");
 
             // re-create database
             onCreate(sqLiteDatabase);
