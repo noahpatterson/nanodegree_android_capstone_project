@@ -2,9 +2,12 @@ package me.noahpatterson.destinycasts;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -25,9 +28,10 @@ import com.facebook.stetho.Stetho;
 
 import java.util.List;
 
+import me.noahpatterson.destinycasts.data.PodcastContract;
 import me.noahpatterson.destinycasts.model.Podcast;
 
-public class WeeklyListActivity extends AppCompatActivity {
+public class WeeklyListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, android.app.LoaderManager.LoaderCallbacks<Object> {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -38,6 +42,8 @@ public class WeeklyListActivity extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private EpisodeAdapter mEpisodeAdapters;
+    private static final int CURSOR_LOADER_ID = 0;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -102,6 +108,16 @@ public class WeeklyListActivity extends AppCompatActivity {
 
         FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
 
+        // initialize loader
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+
+        // initialize our FlavorAdapter
+        mEpisodeAdapters = new EpisodeAdapter(this, null, 0, CURSOR_LOADER_ID);
+        // initialize mGridView to the GridView in fragment_main.xml
+//        mGridView = (GridView) rootView.findViewById(R.id.flavors_grid);
+        // set mGridView adapter to our CursorAdapter
+//        mGridView.setAdapter(mFlavorAdapter);
+
     }
 
     private void startOnboarding() {
@@ -135,6 +151,32 @@ public class WeeklyListActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(android.content.Loader<Object> loader, Object data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(android.content.Loader<Object> loader) {
+
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     /**
