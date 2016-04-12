@@ -41,6 +41,7 @@ public class FetchPodcastFeedsIntentService extends IntentService {
     private static final String FEED_URL_PARAM = "me.noahpatterson.destinycasts.extra.FEED_URL_PARAM";
     private static final String LOG_TAG = "FeedsIntentService";
     private static Context mContext;
+    private static long ONE_DAY_IN_MILLI = 86400000;
 
     public FetchPodcastFeedsIntentService() {
         super("FetchPodcastFeedsIntentService");
@@ -95,6 +96,7 @@ public class FetchPodcastFeedsIntentService extends IntentService {
 
             //loop through favorite podcast urls
             for(String feedUrl : feedUrls) {
+                Log.d(LOG_TAG, "Feedurl = " + feedUrl);
                 Request request = new Request.Builder()
                         .url(feedUrl)
                         .build();
@@ -138,15 +140,22 @@ public class FetchPodcastFeedsIntentService extends IntentService {
             String title = episode.getTitle();
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_TITLE, (title == null ? "N/A" : title));
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION, episode.getDescription());
-            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL, episodeRssItem.itunes.image.toString());
+            //TODO: an empty string image will mess up later, need to replace with the podcast image
+            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL, (episodeRssItem.itunes.image == null ? "" : episodeRssItem.itunes.image.toString()));
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_PUB_DATE, episode.getPublicationDate().getTime());
-            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_URL, episodeRssItem.media.contents.get(0).url.toString());
+            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_URL, (episodeRssItem.media == null ? episodeRssItem.getLink() : episodeRssItem.media.contents.get(0).url.toString()));
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID, podcastId);
         }
 
         // bulkInsert our ContentValues array
         mContext.getContentResolver().bulkInsert(PodcastContract.EpisodeEntry.CONTENT_URI,
                 episodeValuesArr);
+
+        // delete old data so we don't build up an endless history
+//        TODO: we are deleting old episodes older than 7 days, but should keep all this weeks episodes
+        mContext.getContentResolver().delete(PodcastContract.EpisodeEntry.CONTENT_URI,
+                PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + " < ?",
+                new String[] {Long.toString(System.currentTimeMillis() - (ONE_DAY_IN_MILLI * 7))});
     }
 
     long addPodcast(String title, String subtitle, String summary, String podcastUrl, String description) {
