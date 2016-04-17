@@ -32,6 +32,7 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
                     " TEXT NOT NULL, " +
                     PodcastContract.PodcastEntry.COLUMN_SUBTITLE +
                     " TEXT NOT NULL);";
+
             final String SQL_CREATE_EPISODE_TABLE = "CREATE TABLE " +
                     PodcastContract.EpisodeEntry.TABLE_EPISODE + "(" + PodcastContract.EpisodeEntry._ID +
                     " INTEGER PRIMARY KEY AUTOINCREMENT, " +

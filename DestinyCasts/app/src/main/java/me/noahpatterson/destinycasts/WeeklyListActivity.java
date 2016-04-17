@@ -3,12 +3,14 @@ package me.noahpatterson.destinycasts;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
@@ -22,8 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.TextView;
-
 import com.facebook.stetho.Stetho;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.List;
 import me.noahpatterson.destinycasts.data.PodcastContract;
 import me.noahpatterson.destinycasts.model.Podcast;
 
-public class WeeklyListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, android.app.LoaderManager.LoaderCallbacks<Object> {
+public class WeeklyListActivity extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -109,10 +109,11 @@ public class WeeklyListActivity extends AppCompatActivity implements LoaderManag
         FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
 
         // initialize loader
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+//        getLoaderManager().initLoader(CURSOR_LOADER_ID,null, this);
+
 
         // initialize our FlavorAdapter
-        mEpisodeAdapters = new EpisodeAdapter(this, null, 0, CURSOR_LOADER_ID);
+//        mEpisodeAdapters = new EpisodeAdapter(this, null, 0, CURSOR_LOADER_ID);
         // initialize mGridView to the GridView in fragment_main.xml
 //        mGridView = (GridView) rootView.findViewById(R.id.flavors_grid);
         // set mGridView adapter to our CursorAdapter
@@ -154,63 +155,76 @@ public class WeeklyListActivity extends AppCompatActivity implements LoaderManag
     }
 
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(android.content.Loader<Object> loader, Object data) {
-
-    }
-
-    @Override
-    public void onLoaderReset(android.content.Loader<Object> loader) {
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class EpisodeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String ARG_WEEK_NUMBER = "week_number";
+        private EpisodeAdapter mEpisodeAdapters;
+        private RecyclerView mRecyclerView;
 
-        public PlaceholderFragment() {
+        public EpisodeFragment() {
         }
 
         /**
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static EpisodeFragment newInstance(int weekNumber) {
+            EpisodeFragment fragment = new EpisodeFragment();
             Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            args.putInt(ARG_WEEK_NUMBER, weekNumber);
             fragment.setArguments(args);
             return fragment;
         }
 
         @Override
+        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+            getLoaderManager().initLoader(CURSOR_LOADER_ID,null, this);
+            super.onActivityCreated(savedInstanceState);
+        }
+
+        @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, CURSOR_LOADER_ID);
+
             View rootView = inflater.inflate(R.layout.fragment_weekly_list, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_episodes);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            mRecyclerView.setAdapter(mEpisodeAdapters);
+//            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+//            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getActivity(),
+                    PodcastContract.EpisodeEntry.CONTENT_URI,
+                    new String[] {
+                            PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL,
+                            PodcastContract.EpisodeEntry.COLUMN_TITLE,
+                            PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
+                            PodcastContract.EpisodeEntry.COLUMN_PUB_DATE
+                    },
+                    null,
+                    null,
+                    null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            mEpisodeAdapters.swapCursor(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            mEpisodeAdapters.swapCursor(null);
         }
     }
 
@@ -228,7 +242,7 @@ public class WeeklyListActivity extends AppCompatActivity implements LoaderManag
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            return EpisodeFragment.newInstance(position + 1);
         }
 
         @Override

@@ -2,6 +2,7 @@ package me.noahpatterson.destinycasts;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,26 +23,28 @@ import me.noahpatterson.destinycasts.data.PodcastContract;
 /**
  * Created by noahpatterson on 4/12/16.
  */
-public class EpisodeAdapter extends CursorAdapter {
+public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHolder> {
 
     private static final String LOG_TAG = EpisodeAdapter.class.getSimpleName();
     private Context mContext;
     private static int sLoaderID;
+    private Cursor cursor;
 
     public EpisodeAdapter(Context context, Cursor c, int flags, int loaderID){
-        super(context, c, flags);
         Log.d(LOG_TAG, "EpisodeAdapter");
         mContext = context;
         sLoaderID = loaderID;
+        cursor = c;
     }
 
-    public static class ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView episodeImageView;
         public final TextView episodeTitleTextView;
         public final TextView episodeDateTextView;
         public final TextView episodeDescriptionTextView;
 
         public ViewHolder(View view){
+            super(view);
             episodeImageView = (ImageView) view.findViewById(R.id.episodeImageView);
             episodeTitleTextView = (TextView) view.findViewById(R.id.episodeTitleTextView);
             episodeDateTextView = (TextView) view.findViewById(R.id.episodeDateTextView);
@@ -50,23 +53,22 @@ public class EpisodeAdapter extends CursorAdapter {
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int layoutId = R.layout.episode_list_view;
 
         Log.d(LOG_TAG, "In new View");
 
-        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
 
-        return view;
+        return viewHolder;
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-
+    public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Log.d(LOG_TAG, "In bind View");
+        cursor.moveToPosition(position);
 
         //title
         int episodeIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_TITLE);
@@ -81,8 +83,8 @@ public class EpisodeAdapter extends CursorAdapter {
 
         //date
         int episodeDateIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_PUB_DATE);
-        final int episodeDate = cursor.getInt(episodeDateIndex);
-        SimpleDateFormat formatter = new SimpleDateFormat("mmm d", Locale.US);
+        final long episodeDate = cursor.getLong(episodeDateIndex);
+        SimpleDateFormat formatter = new SimpleDateFormat("MMM d", Locale.US);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(episodeDate);
         viewHolder.episodeDateTextView.setText(formatter.format(calendar.getTime()));
@@ -91,5 +93,16 @@ public class EpisodeAdapter extends CursorAdapter {
         int descriptionIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION);
         final String description = cursor.getString(descriptionIndex);
         viewHolder.episodeDescriptionTextView.setText(Html.fromHtml(description).toString());
+    }
+
+    @Override
+    public int getItemCount() {
+        if ( null == cursor ) return 0;
+        return cursor.getCount();
+    }
+
+    public void swapCursor(Cursor newCursor) {
+        cursor = newCursor;
+        notifyDataSetChanged();
     }
 }
