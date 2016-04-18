@@ -155,7 +155,7 @@ public class FetchPodcastFeedsIntentService extends IntentService {
 //        TODO: we are deleting old episodes older than 7 days, but should keep all this weeks episodes
         mContext.getContentResolver().delete(PodcastContract.EpisodeEntry.CONTENT_URI,
                 PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + " < ?",
-                new String[] {Long.toString(System.currentTimeMillis() - (ONE_DAY_IN_MILLI * 7))});
+                new String[] {Long.toString(System.currentTimeMillis() - (ONE_DAY_IN_MILLI * 14))});
     }
 
     long addPodcast(String title, String subtitle, String summary, String podcastUrl, String description) {

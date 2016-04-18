@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,7 +44,8 @@ public class WeeklyListActivity extends AppCompatActivity {
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private EpisodeAdapter mEpisodeAdapters;
-    private static final int CURSOR_LOADER_ID = 0;
+
+    private static long ONE_DAY_IN_MILLI = 86400000;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -166,6 +168,8 @@ public class WeeklyListActivity extends AppCompatActivity {
         private static final String ARG_WEEK_NUMBER = "week_number";
         private EpisodeAdapter mEpisodeAdapters;
         private RecyclerView mRecyclerView;
+//        private  int weekPageNumber;
+//        private  int cursorLoaderId;
 
         public EpisodeFragment() {
         }
@@ -179,19 +183,31 @@ public class WeeklyListActivity extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putInt(ARG_WEEK_NUMBER, weekNumber);
             fragment.setArguments(args);
+
+//            weekPageNumber = weekNumber;
+//            cursorLoaderId = weekNumber;
             return fragment;
         }
 
         @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            int cursorLoaderId = this.getArguments().getInt(ARG_WEEK_NUMBER);
+            getLoaderManager().initLoader(cursorLoaderId,null, this);
+            super.onCreate(savedInstanceState);
+        }
+
+        @Override
         public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-            getLoaderManager().initLoader(CURSOR_LOADER_ID,null, this);
+
             super.onActivityCreated(savedInstanceState);
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, CURSOR_LOADER_ID);
+            Log.d("weeklyList", "in onCreateView");
+            int cursorLoaderId = this.getArguments().getInt(ARG_WEEK_NUMBER);
+            mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId);
 
             View rootView = inflater.inflate(R.layout.fragment_weekly_list, container, false);
             mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_episodes);
@@ -204,26 +220,52 @@ public class WeeklyListActivity extends AppCompatActivity {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return new CursorLoader(getActivity(),
-                    PodcastContract.EpisodeEntry.CONTENT_URI,
-                    new String[] {
-                            PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL,
-                            PodcastContract.EpisodeEntry.COLUMN_TITLE,
-                            PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
-                            PodcastContract.EpisodeEntry.COLUMN_PUB_DATE
-                    },
-                    null,
-                    null,
-                    null);
+            Log.d("weeklyList", "in onCreateLoader");
+            long todaysDateInMilli = System.currentTimeMillis();
+            int weekPageNumber = this.getArguments().getInt(ARG_WEEK_NUMBER);
+            switch (weekPageNumber) {
+                case 0:
+//                    return "This Week";
+                    Log.d("weeklyList", "in this week");
+                    return new CursorLoader(getActivity(),
+                            PodcastContract.EpisodeEntry.CONTENT_URI,
+                            new String[] {
+                                    PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL,
+                                    PodcastContract.EpisodeEntry.COLUMN_TITLE,
+                                    PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
+                                    PodcastContract.EpisodeEntry.COLUMN_PUB_DATE
+                            },
+                            PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + ">=?",
+                            new String[] { Long.toString(todaysDateInMilli - (ONE_DAY_IN_MILLI * 7))},
+                            null);
+                case 1:
+//                    return "Last Week";
+                    Log.d("weeklyList", "in last week");
+                    return new CursorLoader(getActivity(),
+                            PodcastContract.EpisodeEntry.CONTENT_URI,
+                            new String[] {
+                                    PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL,
+                                    PodcastContract.EpisodeEntry.COLUMN_TITLE,
+                                    PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
+                                    PodcastContract.EpisodeEntry.COLUMN_PUB_DATE
+                            },
+                            PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + "<? AND " + PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + ">=?",
+                            new String[] { Long.toString(todaysDateInMilli - (ONE_DAY_IN_MILLI * 7)),Long.toString(todaysDateInMilli - (ONE_DAY_IN_MILLI * 14))},
+                            null);
+            }
+            return null;
+
         }
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            Log.d("weeklyList", "in onLoadFinished");
             mEpisodeAdapters.swapCursor(data);
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
+            Log.d("weeklyList", "in onLoaderReset");
             mEpisodeAdapters.swapCursor(null);
         }
     }
@@ -242,7 +284,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return EpisodeFragment.newInstance(position + 1);
+            return EpisodeFragment.newInstance(position);
         }
 
         @Override
