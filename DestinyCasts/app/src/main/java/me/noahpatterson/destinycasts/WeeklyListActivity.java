@@ -3,6 +3,7 @@ package me.noahpatterson.destinycasts;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
@@ -30,6 +31,7 @@ import com.facebook.stetho.Stetho;
 import java.util.List;
 
 import me.noahpatterson.destinycasts.data.PodcastContract;
+import me.noahpatterson.destinycasts.data.PodcastDBHelper;
 import me.noahpatterson.destinycasts.model.Podcast;
 
 public class WeeklyListActivity extends AppCompatActivity {
@@ -44,6 +46,7 @@ public class WeeklyListActivity extends AppCompatActivity {
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private EpisodeAdapter mEpisodeAdapters;
+    private static List<Podcast> podcastList;
 
     private static long ONE_DAY_IN_MILLI = 86400000;
 
@@ -69,7 +72,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         }
 
         //get podcast favorites
-        List<Podcast> podcastList = Utilities.getPodcastsFavorites(this, preferences);
+        podcastList = Utilities.getPodcastsFavorites(this, preferences);
 
         setContentView(R.layout.activity_weekly_list);
         // Stetho is a tool created by facebook to view your database in chrome inspect.
@@ -168,8 +171,6 @@ public class WeeklyListActivity extends AppCompatActivity {
         private static final String ARG_WEEK_NUMBER = "week_number";
         private EpisodeAdapter mEpisodeAdapters;
         private RecyclerView mRecyclerView;
-//        private  int weekPageNumber;
-//        private  int cursorLoaderId;
 
         public EpisodeFragment() {
         }
@@ -183,9 +184,6 @@ public class WeeklyListActivity extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putInt(ARG_WEEK_NUMBER, weekNumber);
             fragment.setArguments(args);
-
-//            weekPageNumber = weekNumber;
-//            cursorLoaderId = weekNumber;
             return fragment;
         }
 
@@ -198,7 +196,6 @@ public class WeeklyListActivity extends AppCompatActivity {
 
         @Override
         public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-
             super.onActivityCreated(savedInstanceState);
         }
 
@@ -213,8 +210,6 @@ public class WeeklyListActivity extends AppCompatActivity {
             mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_episodes);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             mRecyclerView.setAdapter(mEpisodeAdapters);
-//            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-//            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
         }
 
@@ -223,6 +218,33 @@ public class WeeklyListActivity extends AppCompatActivity {
             Log.d("weeklyList", "in onCreateLoader");
             long todaysDateInMilli = System.currentTimeMillis();
             int weekPageNumber = this.getArguments().getInt(ARG_WEEK_NUMBER);
+            StringBuilder sb = new StringBuilder();
+
+            //get the database
+            PodcastDBHelper dbHelper = new PodcastDBHelper(getContext());
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            for (int i=0;i<podcastList.size();i++)
+            {
+                //query for podcast ID
+                Cursor c = db.query(PodcastContract.PodcastEntry.TABLE_PODCAST,
+                                    new String[] {PodcastContract.PodcastEntry._ID},
+                                    PodcastContract.PodcastEntry.COLUMN_TITLE + "=?",
+                                    new String[] {podcastList.get(i).name},null, null,null,null);
+                if (c.getCount() != 0) {
+                    //build string
+                    c.moveToFirst();
+                    int idIndex = c.getColumnIndex(PodcastContract.PodcastEntry._ID);
+                    sb.append(c.getInt(idIndex));
+                    if (i < podcastList.size() -1) {
+                        sb.append(",");
+                    }
+                }
+                c.close();
+            }
+            String favoritePodcastSelection = " AND " + PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID + " IN ("+ sb.toString() + ")";
+            Log.d("weeklyList", sb.toString());
+            Log.d("weeklyList", favoritePodcastSelection);
             switch (weekPageNumber) {
                 case 0:
 //                    return "This Week";
@@ -235,7 +257,7 @@ public class WeeklyListActivity extends AppCompatActivity {
                                     PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
                                     PodcastContract.EpisodeEntry.COLUMN_PUB_DATE
                             },
-                            PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + ">=?",
+                            PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + ">=?" + favoritePodcastSelection,
                             new String[] { Long.toString(todaysDateInMilli - (ONE_DAY_IN_MILLI * 7))},
                             null);
                 case 1:
@@ -249,7 +271,7 @@ public class WeeklyListActivity extends AppCompatActivity {
                                     PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
                                     PodcastContract.EpisodeEntry.COLUMN_PUB_DATE
                             },
-                            PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + "<? AND " + PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + ">=?",
+                            PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + "<? AND " + PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + ">=?" + favoritePodcastSelection,
                             new String[] { Long.toString(todaysDateInMilli - (ONE_DAY_IN_MILLI * 7)),Long.toString(todaysDateInMilli - (ONE_DAY_IN_MILLI * 14))},
                             null);
             }
