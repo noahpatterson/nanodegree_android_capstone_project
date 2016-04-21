@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +30,7 @@ import android.view.ViewGroup;
 
 import com.facebook.stetho.Stetho;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.noahpatterson.destinycasts.data.PodcastContract;
@@ -218,33 +221,37 @@ public class WeeklyListActivity extends AppCompatActivity {
             Log.d("weeklyList", "in onCreateLoader");
             long todaysDateInMilli = System.currentTimeMillis();
             int weekPageNumber = this.getArguments().getInt(ARG_WEEK_NUMBER);
-            StringBuilder sb = new StringBuilder();
+//            StringBuilder sb = new StringBuilder();
+            ArrayList<String> favPodcastNames = new ArrayList<String>();
+            for(Podcast podcast : podcastList) {
+                favPodcastNames.add(podcast.name);
+            }
 
             //get the database
-            PodcastDBHelper dbHelper = new PodcastDBHelper(getContext());
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-            for (int i=0;i<podcastList.size();i++)
-            {
-                //query for podcast ID
-                Cursor c = db.query(PodcastContract.PodcastEntry.TABLE_PODCAST,
-                                    new String[] {PodcastContract.PodcastEntry._ID},
-                                    PodcastContract.PodcastEntry.COLUMN_TITLE + "=?",
-                                    new String[] {podcastList.get(i).name},null, null,null,null);
-                if (c.getCount() != 0) {
-                    //build string
-                    c.moveToFirst();
-                    int idIndex = c.getColumnIndex(PodcastContract.PodcastEntry._ID);
-                    sb.append(c.getInt(idIndex));
-                    if (i < podcastList.size() -1) {
-                        sb.append(",");
-                    }
-                }
-                c.close();
-            }
-            String favoritePodcastSelection = " AND " + PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID + " IN ("+ sb.toString() + ")";
-            Log.d("weeklyList", sb.toString());
-            Log.d("weeklyList", favoritePodcastSelection);
+//            PodcastDBHelper dbHelper = new PodcastDBHelper(getContext());
+//            SQLiteDatabase db = dbHelper.getWritableDatabase();
+//
+//            for (int i=0;i<podcastList.size();i++)
+//            {
+//                //query for podcast ID
+//                Cursor c = db.query(PodcastContract.PodcastEntry.TABLE_PODCAST,
+//                                    new String[] {PodcastContract.PodcastEntry._ID},
+//                                    PodcastContract.PodcastEntry.COLUMN_TITLE + "=?",
+//                                    new String[] {podcastList.get(i).name},null, null,null,null);
+//                if (c.getCount() != 0) {
+//                    //build string
+//                    c.moveToFirst();
+//                    int idIndex = c.getColumnIndex(PodcastContract.PodcastEntry._ID);
+//                    sb.append(c.getInt(idIndex));
+//                    if (i < podcastList.size() -1) {
+//                        sb.append(",");
+//                    }
+//                }
+//                c.close();
+//            }
+            String favoritePodcastSelection = " AND " + PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE + " IN ("+ TextUtils.join(",", favPodcastNames) + ")";
+//            Log.d("weeklyList", sb.toString());
+//            Log.d("weeklyList", favoritePodcastSelection);
             switch (weekPageNumber) {
                 case 0:
 //                    return "This Week";

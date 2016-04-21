@@ -45,6 +45,8 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
                     " INTEGER NOT NULL, " +
                     PodcastContract.EpisodeEntry.COLUMN_URL +
                     " TEXT NOT NULL, " +
+                    PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE +
+                    " TEXT NOT NULL, " +
                     PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID + " INTEGER NOT NULL, " +
                     // Set up the location column as a foreign key to location table.
                     " FOREIGN KEY (" + PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID + ") REFERENCES " +

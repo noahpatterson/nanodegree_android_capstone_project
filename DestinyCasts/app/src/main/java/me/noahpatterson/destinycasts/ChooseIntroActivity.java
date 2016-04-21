@@ -2,14 +2,12 @@ package me.noahpatterson.destinycasts;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridView;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,13 +21,6 @@ public class ChooseIntroActivity extends AppCompatActivity {
     private SharedPreferences preferences;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_intro);
@@ -39,7 +30,6 @@ public class ChooseIntroActivity extends AppCompatActivity {
                 getSharedPreferences("my_preferences", MODE_PRIVATE);
 
         List<Podcast> podcastList = Utilities.getPodcastsFavorites(this, preferences);
-
 
         podcastGridView = (GridView) findViewById(R.id.podcastGridView);
 
@@ -52,8 +42,6 @@ public class ChooseIntroActivity extends AppCompatActivity {
         }
         podcastAdapter = new PodcastChooseArrayAdapter(this, favoritePodcasts);
         podcastGridView.setAdapter(podcastAdapter);
-
-
     }
 
     public void finishOnboarding(View view) {

@@ -85,10 +85,6 @@ public class FetchPodcastFeedsIntentService extends IntentService {
         }
     }
 
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
     private void handleActionFetchNew(ArrayList<String> feedUrls) {
         OkHttpClient client = new OkHttpClient();
 
@@ -120,13 +116,12 @@ public class FetchPodcastFeedsIntentService extends IntentService {
 
     // insert data into database
     private void insertData(Feed feed){
-//        ContentValues[] podcastValuesArr = new ContentValues[feedUrls.size()];
         List episodeList = feed.getItems();
         ContentValues[] episodeValuesArr = new ContentValues[10];
 
-//        ContentValues podcastData = new ContentValues();
+        String podcastTitle = feed.getTitle();
 
-        long podcastId = addPodcast(feed.getTitle(),
+        long podcastId = addPodcast(podcastTitle,
                                    ((RSSFeed) feed).itunes.subtitle,
                                    ((RSSFeed) feed).itunes.subtitle,
                                    feed.getLink(),
@@ -145,6 +140,7 @@ public class FetchPodcastFeedsIntentService extends IntentService {
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_PUB_DATE, episode.getPublicationDate().getTime());
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_URL, (episodeRssItem.media == null ? episodeRssItem.getLink() : episodeRssItem.media.contents.get(0).url.toString()));
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID, podcastId);
+            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE, podcastTitle);
         }
 
         // bulkInsert our ContentValues array
