@@ -60,10 +60,10 @@ public class FetchPodcastFeedsIntentService extends IntentService {
         int favoriteLength = 0;
         for(int i =0;i < podcastList.size();i++) {
             Podcast podcast = podcastList.get(i);
-            if (podcast.isSelected) {
+//            if (podcast.isSelected) {
                 favorites.add(favoriteLength, podcast.rssFeedUrlString);
                 favoriteLength++;
-            }
+//            }
         }
 
         Intent intent = new Intent(context, FetchPodcastFeedsIntentService.class);

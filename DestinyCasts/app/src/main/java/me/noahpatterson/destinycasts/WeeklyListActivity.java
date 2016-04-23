@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import com.facebook.stetho.Stetho;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import me.noahpatterson.destinycasts.data.PodcastContract;
@@ -50,6 +51,7 @@ public class WeeklyListActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private EpisodeAdapter mEpisodeAdapters;
     private static List<Podcast> podcastList;
+    private static List<Podcast> favPodcastList;
 
     private static long ONE_DAY_IN_MILLI = 86400000;
 
@@ -74,8 +76,11 @@ public class WeeklyListActivity extends AppCompatActivity {
             return;
         }
 
+        //get all podcast list
+        podcastList = Arrays.asList(Utilities.podcastsList);
+
         //get podcast favorites
-        podcastList = Utilities.getPodcastsFavorites(this, preferences);
+        favPodcastList = Utilities.getPodcastsFavorites(this, preferences);
 
         setContentView(R.layout.activity_weekly_list);
         // Stetho is a tool created by facebook to view your database in chrome inspect.
@@ -221,10 +226,17 @@ public class WeeklyListActivity extends AppCompatActivity {
             Log.d("weeklyList", "in onCreateLoader");
             long todaysDateInMilli = System.currentTimeMillis();
             int weekPageNumber = this.getArguments().getInt(ARG_WEEK_NUMBER);
-//            StringBuilder sb = new StringBuilder();
-            ArrayList<String> favPodcastNames = new ArrayList<String>();
-            for(Podcast podcast : podcastList) {
-                favPodcastNames.add(podcast.name);
+            StringBuilder sb = new StringBuilder();
+//            ArrayList<String> favPodcastNames = new ArrayList<String>();
+            if (favPodcastList != null) {
+                for (int i = 0; i < favPodcastList.size(); i++) {
+//                favPodcastNames.add(podcast.name);
+                    Podcast podcast = favPodcastList.get(i);
+                    if (podcast.isSelected) {
+                        sb.append("\"" + podcast.name + "\",");
+                    }
+                }
+                sb.deleteCharAt(sb.length() - 1);
             }
 
             //get the database
@@ -249,7 +261,7 @@ public class WeeklyListActivity extends AppCompatActivity {
 //                }
 //                c.close();
 //            }
-            String favoritePodcastSelection = " AND " + PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE + " IN ("+ TextUtils.join(",", favPodcastNames) + ")";
+            String favoritePodcastSelection = " AND " + PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE + " IN ("+ sb.toString() + ")";
 //            Log.d("weeklyList", sb.toString());
 //            Log.d("weeklyList", favoritePodcastSelection);
             switch (weekPageNumber) {
