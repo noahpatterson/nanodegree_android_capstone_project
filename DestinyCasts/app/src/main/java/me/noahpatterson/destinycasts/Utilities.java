@@ -19,19 +19,19 @@ public class Utilities {
     public static void setImageSelected(View imageView, Podcast podcast) {
         boolean selected = podcast.isSelected;
         if (selected) {
-            imageView.setAlpha(0.5f);
-        } else {
             imageView.setAlpha(1.0f);
+        } else {
+            imageView.setAlpha(0.5f);
         }
     }
 
     public static void togglePodcastSelected(View podcastView, Podcast podcast) {
         boolean selected = podcast.isSelected;
         if (!selected) {
-            podcastView.setAlpha(0.5f);
+            podcastView.setAlpha(1.0f);
             podcast.isSelected = true;
         } else {
-            podcastView.setAlpha(1.0f);
+            podcastView.setAlpha(0.5f);
             podcast.isSelected = false;
         }
     }
