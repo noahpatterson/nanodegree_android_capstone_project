@@ -120,18 +120,6 @@ public class WeeklyListActivity extends AppCompatActivity {
 //        });
 
         FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
-
-        // initialize loader
-//        getLoaderManager().initLoader(CURSOR_LOADER_ID,null, this);
-
-
-        // initialize our FlavorAdapter
-//        mEpisodeAdapters = new EpisodeAdapter(this, null, 0, CURSOR_LOADER_ID);
-        // initialize mGridView to the GridView in fragment_main.xml
-//        mGridView = (GridView) rootView.findViewById(R.id.flavors_grid);
-        // set mGridView adapter to our CursorAdapter
-//        mGridView.setAdapter(mFlavorAdapter);
-
     }
 
     private void startOnboarding() {
@@ -227,10 +215,8 @@ public class WeeklyListActivity extends AppCompatActivity {
             long todaysDateInMilli = System.currentTimeMillis();
             int weekPageNumber = this.getArguments().getInt(ARG_WEEK_NUMBER);
             StringBuilder sb = new StringBuilder();
-//            ArrayList<String> favPodcastNames = new ArrayList<String>();
             if (favPodcastList != null) {
                 for (int i = 0; i < favPodcastList.size(); i++) {
-//                favPodcastNames.add(podcast.name);
                     Podcast podcast = favPodcastList.get(i);
                     if (podcast.isSelected) {
                         sb.append("\"" + podcast.name + "\",");
@@ -240,27 +226,6 @@ public class WeeklyListActivity extends AppCompatActivity {
             }
 
             //get the database
-//            PodcastDBHelper dbHelper = new PodcastDBHelper(getContext());
-//            SQLiteDatabase db = dbHelper.getWritableDatabase();
-//
-//            for (int i=0;i<podcastList.size();i++)
-//            {
-//                //query for podcast ID
-//                Cursor c = db.query(PodcastContract.PodcastEntry.TABLE_PODCAST,
-//                                    new String[] {PodcastContract.PodcastEntry._ID},
-//                                    PodcastContract.PodcastEntry.COLUMN_TITLE + "=?",
-//                                    new String[] {podcastList.get(i).name},null, null,null,null);
-//                if (c.getCount() != 0) {
-//                    //build string
-//                    c.moveToFirst();
-//                    int idIndex = c.getColumnIndex(PodcastContract.PodcastEntry._ID);
-//                    sb.append(c.getInt(idIndex));
-//                    if (i < podcastList.size() -1) {
-//                        sb.append(",");
-//                    }
-//                }
-//                c.close();
-//            }
             String favoritePodcastSelection = " AND " + PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE + " IN ("+ sb.toString() + ")";
 //            Log.d("weeklyList", sb.toString());
 //            Log.d("weeklyList", favoritePodcastSelection);

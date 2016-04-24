@@ -26,8 +26,7 @@ public class ChooseIntroActivity extends AppCompatActivity {
         setContentView(R.layout.activity_choose_intro);
 
         // Get the shared preferences
-        preferences =
-                getSharedPreferences("my_preferences", MODE_PRIVATE);
+        preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
 
         List<Podcast> podcastList = Utilities.getPodcastsFavorites(this, preferences);
 
@@ -73,11 +72,13 @@ public class ChooseIntroActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        storeSelectedPodcasts();
         super.onStop();
     }
 
     @Override
     protected void onPause() {
+        storeSelectedPodcasts();
         super.onPause();
     }
 
