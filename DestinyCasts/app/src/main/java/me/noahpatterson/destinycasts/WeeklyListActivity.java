@@ -63,8 +63,11 @@ public class WeeklyListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
+        
+        //call the Rss lookup as fast as possible
+        //get all podcast list
+        podcastList = Arrays.asList(Utilities.podcastsList);
+        FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
 
         // Get the shared preferences
         SharedPreferences preferences =  getSharedPreferences("my_preferences", MODE_PRIVATE);
@@ -75,9 +78,6 @@ public class WeeklyListActivity extends AppCompatActivity {
 
             return;
         }
-
-        //get all podcast list
-        podcastList = Arrays.asList(Utilities.podcastsList);
 
         //get podcast favorites
         favPodcastList = Utilities.getPodcastsFavorites(this, preferences);
@@ -118,8 +118,6 @@ public class WeeklyListActivity extends AppCompatActivity {
 //                        .setAction("Action", null).show();
 //            }
 //        });
-
-        FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
     }
 
     private void startOnboarding() {
