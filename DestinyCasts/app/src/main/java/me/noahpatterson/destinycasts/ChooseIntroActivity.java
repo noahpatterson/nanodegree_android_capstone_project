@@ -19,6 +19,7 @@ public class ChooseIntroActivity extends AppCompatActivity {
     private GridView podcastGridView;
     private PodcastChooseArrayAdapter podcastAdapter;
     private SharedPreferences preferences;
+    private List<Podcast> favoritePodcasts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,7 @@ public class ChooseIntroActivity extends AppCompatActivity {
         podcastGridView = (GridView) findViewById(R.id.podcastGridView);
 
         //if saved favorites, load them, else create a new list
-        List<Podcast> favoritePodcasts;
+//        List<Podcast> favoritePodcasts;
         if (podcastList != null) {
             favoritePodcasts = podcastList;
         } else {
@@ -83,9 +84,9 @@ public class ChooseIntroActivity extends AppCompatActivity {
     }
 
     private void storeSelectedPodcasts() {
-        List podcastItems = podcastAdapter.getAllItems();
+//        List podcastItems = podcastAdapter.getAllItems();
         Gson gson = new Gson();
-        String jsonText = gson.toJson(podcastItems);
+        String jsonText = gson.toJson(favoritePodcasts);
         preferences.edit()
                 .putString("podcast favorites",jsonText).apply();
     }
