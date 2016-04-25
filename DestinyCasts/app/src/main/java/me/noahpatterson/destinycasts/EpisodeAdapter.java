@@ -70,6 +70,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         Log.d(LOG_TAG, "In bind View");
         cursor.moveToPosition(position);
 
+        //podcast title
+        int podcastTitleIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE);
+        final String podcastTitle = cursor.getString(podcastTitleIndex);
+
         //title
         int episodeIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_TITLE);
         final String episodeName = cursor.getString(episodeIndex);
@@ -78,8 +82,9 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         //image
         int imageIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL);
         String imageUrl = cursor.getString(imageIndex);
+
         Log.i(LOG_TAG, "Image reference extracted: " + imageUrl);
-        Glide.with(mContext).load(imageUrl).into(viewHolder.episodeImageView);
+        Glide.with(mContext).load(imageUrl.equals("") ? Utilities.findPodcastImage(podcastTitle) : imageUrl).into(viewHolder.episodeImageView);
 
         //date
         int episodeDateIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_PUB_DATE);

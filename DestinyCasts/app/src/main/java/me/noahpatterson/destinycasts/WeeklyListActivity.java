@@ -63,7 +63,7 @@ public class WeeklyListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         //call the Rss lookup as fast as possible
         //get all podcast list
         podcastList = Arrays.asList(Utilities.podcastsList);
@@ -237,7 +237,8 @@ public class WeeklyListActivity extends AppCompatActivity {
                                     PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL,
                                     PodcastContract.EpisodeEntry.COLUMN_TITLE,
                                     PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
-                                    PodcastContract.EpisodeEntry.COLUMN_PUB_DATE
+                                    PodcastContract.EpisodeEntry.COLUMN_PUB_DATE,
+                                    PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE
                             },
                             PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + ">=?" + favoritePodcastSelection,
                             new String[] { Long.toString(todaysDateInMilli - (ONE_DAY_IN_MILLI * 7))},
@@ -251,7 +252,8 @@ public class WeeklyListActivity extends AppCompatActivity {
                                     PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL,
                                     PodcastContract.EpisodeEntry.COLUMN_TITLE,
                                     PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
-                                    PodcastContract.EpisodeEntry.COLUMN_PUB_DATE
+                                    PodcastContract.EpisodeEntry.COLUMN_PUB_DATE,
+                                    PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE
                             },
                             PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + "<? AND " + PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + ">=?" + favoritePodcastSelection,
                             new String[] { Long.toString(todaysDateInMilli - (ONE_DAY_IN_MILLI * 7)),Long.toString(todaysDateInMilli - (ONE_DAY_IN_MILLI * 14))},

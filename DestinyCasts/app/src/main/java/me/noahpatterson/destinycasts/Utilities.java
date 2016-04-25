@@ -51,4 +51,21 @@ public class Utilities {
         String jsonText = preferences.getString("podcast favorites", null);
         return gson.fromJson(jsonText, new TypeToken<List<Podcast>>(){}.getType());
     }
+
+    public static int findPodcastImage(String podcastTitle) {
+        switch (podcastTitle) {
+            case "Destiny The Show | DTS":
+                return R.drawable.destiny_the_show;
+            case "Ghost Stories, a Destiny Podcast":
+                return R.drawable.destiny_ghost_stories;
+            case "Fireteam Chat: IGN's Destiny Podcast":
+                return R.drawable.crucible_radio;
+            case "Guardian Radio":
+                return R.drawable.guardian_radio;
+            case "Crucible Radio":
+                return R.drawable.fireteam_chat;
+            default:
+                return 0;
+        }
+    }
 }
