@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,16 +27,16 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     private static final String LOG_TAG = EpisodeAdapter.class.getSimpleName();
     private Context mContext;
     private static int sLoaderID;
-    private Cursor cursor;
+    private Cursor mCursor;
 
-    public EpisodeAdapter(Context context, Cursor c, int flags, int loaderID){
+    public EpisodeAdapter(Context context, Cursor c, int flags, int loaderID, EpisodeAdapterOnClickHandler episodeAdapterOnClickHandler){
         Log.d(LOG_TAG, "EpisodeAdapter");
         mContext = context;
         sLoaderID = loaderID;
-        cursor = c;
+        mCursor = c;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final ImageView episodeImageView;
         public final TextView episodeTitleTextView;
         public final TextView episodeDateTextView;
@@ -49,7 +48,19 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
             episodeTitleTextView = (TextView) view.findViewById(R.id.episodeTitleTextView);
             episodeDateTextView = (TextView) view.findViewById(R.id.episodeDateTextView);
             episodeDescriptionTextView = (TextView) view.findViewById(R.id.episodeDescriptionTextView);
+            view.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            int adapterPosition = getAdapterPosition();
+            mCursor.moveToPosition(adapterPosition);
+
+        }
+    }
+
+    public static interface EpisodeAdapterOnClickHandler {
+        void onClick(int podcastId, ViewHolder vh);
     }
 
     @Override
@@ -68,46 +79,46 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Log.d(LOG_TAG, "In bind View");
-        cursor.moveToPosition(position);
+        mCursor.moveToPosition(position);
 
         //podcast title
-        int podcastTitleIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE);
-        final String podcastTitle = cursor.getString(podcastTitleIndex);
+        int podcastTitleIndex = mCursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE);
+        final String podcastTitle = mCursor.getString(podcastTitleIndex);
 
         //title
-        int episodeIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_TITLE);
-        final String episodeName = cursor.getString(episodeIndex);
+        int episodeIndex = mCursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_TITLE);
+        final String episodeName = mCursor.getString(episodeIndex);
         viewHolder.episodeTitleTextView.setText(episodeName);
 
         //image
-        int imageIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL);
-        String imageUrl = cursor.getString(imageIndex);
+        int imageIndex = mCursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL);
+        String imageUrl = mCursor.getString(imageIndex);
 
         Log.i(LOG_TAG, "Image reference extracted: " + imageUrl);
         Glide.with(mContext).load(imageUrl.equals("") ? Utilities.findPodcastImage(podcastTitle) : imageUrl).into(viewHolder.episodeImageView);
 
         //date
-        int episodeDateIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_PUB_DATE);
-        final long episodeDate = cursor.getLong(episodeDateIndex);
+        int episodeDateIndex = mCursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_PUB_DATE);
+        final long episodeDate = mCursor.getLong(episodeDateIndex);
         SimpleDateFormat formatter = new SimpleDateFormat("MMM d", Locale.US);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(episodeDate);
         viewHolder.episodeDateTextView.setText(formatter.format(calendar.getTime()));
 
         //description
-        int descriptionIndex = cursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION);
-        final String description = cursor.getString(descriptionIndex);
+        int descriptionIndex = mCursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION);
+        final String description = mCursor.getString(descriptionIndex);
         viewHolder.episodeDescriptionTextView.setText(Html.fromHtml(description).toString());
     }
 
     @Override
     public int getItemCount() {
-        if ( null == cursor ) return 0;
-        return cursor.getCount();
+        if ( null == mCursor) return 0;
+        return mCursor.getCount();
     }
 
     public void swapCursor(Cursor newCursor) {
-        cursor = newCursor;
+        mCursor = newCursor;
         notifyDataSetChanged();
     }
 }
