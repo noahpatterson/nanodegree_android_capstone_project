@@ -28,12 +28,14 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     private Context mContext;
     private static int sLoaderID;
     private Cursor mCursor;
+    private EpisodeAdapterOnClickHandler eClickHandler;
 
     public EpisodeAdapter(Context context, Cursor c, int flags, int loaderID, EpisodeAdapterOnClickHandler episodeAdapterOnClickHandler){
         Log.d(LOG_TAG, "EpisodeAdapter");
         mContext = context;
         sLoaderID = loaderID;
         mCursor = c;
+        eClickHandler = episodeAdapterOnClickHandler;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -55,7 +57,9 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-
+            int podcastIdIndex = mCursor.getColumnIndex(PodcastContract.EpisodeEntry._ID);
+            int podcastId = mCursor.getInt(podcastIdIndex);
+            eClickHandler.onClick(podcastId,this);
         }
     }
 

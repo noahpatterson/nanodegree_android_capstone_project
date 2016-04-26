@@ -198,7 +198,14 @@ public class WeeklyListActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             Log.d("weeklyList", "in onCreateView");
             int cursorLoaderId = this.getArguments().getInt(ARG_WEEK_NUMBER);
-            mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId);
+            mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId, new EpisodeAdapter.EpisodeAdapterOnClickHandler() {
+                @Override
+                public void onClick(int podcastId, EpisodeAdapter.ViewHolder vh) {
+                    Intent intent = new Intent(getActivity(), EpisodeActivity.class);
+                    intent.putExtra("podcast_id", podcastId);
+                    startActivity(intent);
+                }
+            });
 
             View rootView = inflater.inflate(R.layout.fragment_weekly_list, container, false);
             mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_episodes);
@@ -234,6 +241,7 @@ public class WeeklyListActivity extends AppCompatActivity {
                     return new CursorLoader(getActivity(),
                             PodcastContract.EpisodeEntry.CONTENT_URI,
                             new String[] {
+                                    PodcastContract.EpisodeEntry._ID,
                                     PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL,
                                     PodcastContract.EpisodeEntry.COLUMN_TITLE,
                                     PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
@@ -249,6 +257,7 @@ public class WeeklyListActivity extends AppCompatActivity {
                     return new CursorLoader(getActivity(),
                             PodcastContract.EpisodeEntry.CONTENT_URI,
                             new String[] {
+                                    PodcastContract.EpisodeEntry._ID,
                                     PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL,
                                     PodcastContract.EpisodeEntry.COLUMN_TITLE,
                                     PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,

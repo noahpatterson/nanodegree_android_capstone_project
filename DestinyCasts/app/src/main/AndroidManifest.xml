@@ -24,13 +24,23 @@
 
         <service
             android:name=".FetchPodcastFeedsIntentService"
-            android:exported="false"/>
+            android:exported="false" />
 
         <provider
-            android:authorities="@string/content_authority"
             android:name=".data.PodcastProvider"
+            android:authorities="@string/content_authority"
             android:exported="false"
-            android:syncable="true"/>
+            android:syncable="true" />
+
+        <activity
+            android:name=".EpisodeActivity"
+            android:label="@string/title_activity_episode"
+            android:parentActivityName=".WeeklyListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.noahpatterson.destinycasts.WeeklyListActivity" />
+        </activity>
     </application>
 
 </manifest>

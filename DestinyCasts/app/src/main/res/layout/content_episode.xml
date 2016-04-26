@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="me.noahpatterson.destinycasts.EpisodeActivity"
+    tools:showIn="@layout/activity_episode">
+
+    <ImageView
+        android:id="@+id/episodeDetailImageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        tools:src="@drawable/crucible_radio"
+        android:scaleType="centerInside"
+        android:contentDescription="@string/crucible_radio_logo"
+        />
+    <TextView
+        android:id="@+id/episodeDetailTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Crucible Radio Ep. 42 - How to Prep for the April Update"
+        android:layout_below="@id/episodeDetailImageView"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:padding="8dp"/>
+
+    <TextView
+        android:id="@+id/episodeDetailDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="April 7"
+        android:layout_below="@id/episodeDetailTitle"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        />
+
+    <TextView
+        android:id="@+id/episodeDetailDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="120dp"
+        android:textSize="18sp"
+        android:layout_below="@id/episodeDetailDate"
+        android:padding="8dp"
+        android:scrollbars="vertical"
+        tools:text="Description - a really long description about a podcast. This has a lot of text and I want to konw if it goes off the screen at some point. But we are about to wrap to a new line here. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come.">
+    </TextView>
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:id="@+id/playerSeekBar"
+        android:layout_below="@id/episodeDetailDescription"
+        />
+
+    <RelativeLayout
+        android:id="@+id/episodeDetailTrackPositionArea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:layout_below="@id/playerSeekBar">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/playerCurrentTrackPosition"
+            android:layout_alignParentStart="true"
+            tools:text="00:00"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/playerTotalTrackTime"
+            android:layout_alignParentEnd="true"
+            tools:text="00:30"/>
+
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/episodeDetailTrackPositionArea"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp">
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/playerPreviousButton"
+            android:src="@android:drawable/ic_media_previous"/>
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/playerPlayButton"
+            android:src="@android:drawable/ic_media_play"
+            />
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/playerNextButton"
+            android:src="@android:drawable/ic_media_next"
+            />
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>
