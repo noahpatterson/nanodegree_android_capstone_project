@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="me.noahpatterson.destinycasts.EpisodeActivity"
-    tools:showIn="@layout/activity_episode">
+    android:fitsSystemWindows="true"
+    tools:showIn="@layout/activity_episode"
+    android:orientation="vertical"
+    android:paddingTop="?android:actionBarSize">
 
     <ImageView
         android:id="@+id/episodeDetailImageView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         tools:src="@drawable/crucible_radio"
         android:scaleType="centerInside"
         android:contentDescription="@string/crucible_radio_logo"
         />
     <TextView
         android:id="@+id/episodeDetailTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxLines="2"
+        android:ellipsize="end"
         tools:text="Crucible Radio Ep. 42 - How to Prep for the April Update"
-        android:layout_below="@id/episodeDetailImageView"
-        android:layout_centerHorizontal="true"
         android:textAlignment="center"
         android:textStyle="bold"
         android:textSize="20sp"
@@ -30,11 +33,9 @@
 
     <TextView
         android:id="@+id/episodeDetailDate"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text="April 7"
-        android:layout_below="@id/episodeDetailTitle"
-        android:layout_centerHorizontal="true"
         android:textAlignment="center"
         android:textStyle="bold"
         android:textSize="16sp"
@@ -42,23 +43,30 @@
         android:paddingEnd="8dp"
         />
 
-    <TextView
-        android:id="@+id/episodeDetailDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="120dp"
-        android:textSize="18sp"
-        android:layout_below="@id/episodeDetailDate"
+    <ScrollView android:id="@+id/episodeDescriptionScroller"
+        android:layout_width="match_parent"
+        android:layout_weight="2"
+        android:layout_height="0dp"
         android:padding="8dp"
-        android:scrollbars="vertical"
-        tools:text="Description - a really long description about a podcast. This has a lot of text and I want to konw if it goes off the screen at some point. But we are about to wrap to a new line here. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come.">
-    </TextView>
+        android:scrollbars="vertical">
+
+        <TextView
+            android:id="@+id/episodeDetailDescription"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="18sp"
+            android:autoLink="all"
+            android:linksClickable="true"
+            tools:text="Description - a really long description about a podcast. This has a lot of text and I want to konw if it goes off the screen at some point. But we are about to wrap to a new line here. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come.">
+        </TextView>
+
+    </ScrollView>
 
     <SeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:id="@+id/playerSeekBar"
-        android:layout_below="@id/episodeDetailDescription"
         />
 
     <RelativeLayout
@@ -69,8 +77,7 @@
         android:layout_marginBottom="8dp"
         android:paddingEnd="8dp"
         android:paddingStart="8dp"
-        android:layout_below="@id/playerSeekBar">
-
+        >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -90,7 +97,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/episodeDetailTrackPositionArea"
         android:paddingEnd="8dp"
         android:paddingStart="8dp">
 
@@ -114,9 +120,5 @@
             android:id="@+id/playerNextButton"
             android:src="@android:drawable/ic_media_next"
             />
-
     </LinearLayout>
-
-
-
-</RelativeLayout>
+</LinearLayout>

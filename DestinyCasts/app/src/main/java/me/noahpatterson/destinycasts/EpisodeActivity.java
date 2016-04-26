@@ -95,7 +95,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 //description
                 int descriptionIndex = c.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION);
                 final String description = c.getString(descriptionIndex);
-                TextView episodeDetailDescription = (TextView) findViewById(R.id.episodeDetailTitle);
+                TextView episodeDetailDescription = (TextView) findViewById(R.id.episodeDetailDescription);
                 episodeDetailDescription.setText(Html.fromHtml(description).toString());
             }
             c.close();
