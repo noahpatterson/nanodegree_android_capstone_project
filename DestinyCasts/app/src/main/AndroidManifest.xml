@@ -41,6 +41,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="me.noahpatterson.destinycasts.WeeklyListActivity" />
         </activity>
+
+        <service
+            android:name=".service.PlayerService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

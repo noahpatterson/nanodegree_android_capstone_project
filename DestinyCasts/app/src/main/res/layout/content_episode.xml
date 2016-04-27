@@ -53,7 +53,7 @@
         <TextView
             android:id="@+id/episodeDetailDescription"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:textSize="18sp"
             android:autoLink="all"
             android:linksClickable="true"
@@ -93,32 +93,14 @@
             tools:text="00:30"/>
 
     </RelativeLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp">
 
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:id="@+id/playerPreviousButton"
-            android:src="@android:drawable/ic_media_previous"/>
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:id="@+id/playerPlayButton"
-            android:src="@android:drawable/ic_media_play"
-            />
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:id="@+id/playerNextButton"
-            android:src="@android:drawable/ic_media_next"
-            />
-    </LinearLayout>
+    <ImageButton
+        android:contentDescription="@string/play_episode"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_gravity="center"
+        android:id="@+id/playerPlayButton"
+        android:src="@android:drawable/ic_media_play"
+        />
+
 </LinearLayout>

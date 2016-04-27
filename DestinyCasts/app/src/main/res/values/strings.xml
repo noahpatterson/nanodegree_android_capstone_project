@@ -11,4 +11,5 @@
     <string name="content_authority">me.noahpatterson.destinycasts.app</string>
     <string name="title_activity_episode">EpisodeActivity</string>
     <string name="crucible_radio_logo">Crucible radio logo</string>
+    <string name="play_episode">play episode</string>
 </resources>
