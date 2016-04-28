@@ -10,8 +10,11 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.einmalfel.earl.EarlParser;
+import com.einmalfel.earl.Enclosure;
 import com.einmalfel.earl.Feed;
 import com.einmalfel.earl.Item;
+import com.einmalfel.earl.MediaItem;
+import com.einmalfel.earl.RSSEnclosure;
 import com.einmalfel.earl.RSSFeed;
 import com.einmalfel.earl.RSSItem;
 
@@ -19,6 +22,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.DataFormatException;
@@ -135,12 +139,12 @@ public class FetchPodcastFeedsIntentService extends IntentService {
             String title = episode.getTitle();
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_TITLE, (title == null ? "N/A" : title));
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION, episode.getDescription());
-            //TODO: an empty string image will mess up later, need to replace with the podcast image
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL, (episodeRssItem.itunes.image == null ? "" : episodeRssItem.itunes.image.toString()));
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_PUB_DATE, episode.getPublicationDate().getTime());
-            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_URL, (episodeRssItem.media == null ? episodeRssItem.getLink() : episodeRssItem.media.contents.get(0).url.toString()));
+            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_URL, getCorrectMp3Url(episodeRssItem));
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID, podcastId);
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE, podcastTitle);
+            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_EPISODE_LENGTH, episodeRssItem.itunes.duration != null ? episodeRssItem.itunes.duration : 0);
         }
 
         // bulkInsert our ContentValues array
@@ -193,5 +197,29 @@ public class FetchPodcastFeedsIntentService extends IntentService {
         podcastCursor.close();
         // Wait, that worked?  Yes!
         return podcastId;
+    }
+
+    String getCorrectMp3Url(RSSItem episode) {
+//        episodeRssItem.media == null ? episodeRssItem.getLink() : episodeRssItem.media.contents.get(0).url.toString())
+        String link = episode.getLink();
+        MediaItem media = episode.media;
+        List<RSSEnclosure> enclosuresList = episode.enclosures;
+        URL mediaContents = null;
+        URL enclosure = null;
+        if (media != null) {
+            mediaContents = media.contents.get(0).url;
+        }
+        if (!enclosuresList.isEmpty()) {
+            enclosure = enclosuresList.get(0).url;
+        }
+        if (link != null && link.endsWith(".mp3")) {
+            return link;
+        } else if ( mediaContents != null && mediaContents.toString().endsWith(".mp3")) {
+            return mediaContents.toString();
+        } else if (enclosure != null && enclosure.toString().endsWith(".mp3")) {
+            return enclosure.toString();
+        }
+        Log.e(LOG_TAG, "cannot find episode url");
+        return "";
     }
 }

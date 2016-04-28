@@ -13,7 +13,7 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
 
         //name & version
         private static final String DATABASE_NAME = "podcast.db";
-        private static final int DATABASE_VERSION = 6;
+        private static final int DATABASE_VERSION = 8;
 
         public PodcastDBHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -47,6 +47,8 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
                     " TEXT NOT NULL, " +
                     PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE +
                     " TEXT NOT NULL, " +
+                    PodcastContract.EpisodeEntry.COLUMN_EPISODE_LENGTH +
+                    " INTEGER NOT NULL, " +
                     PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID + " INTEGER NOT NULL, " +
                     // Set up the location column as a foreign key to location table.
                     " FOREIGN KEY (" + PodcastContract.EpisodeEntry.COLUMN_PODCAST_ID + ") REFERENCES " +

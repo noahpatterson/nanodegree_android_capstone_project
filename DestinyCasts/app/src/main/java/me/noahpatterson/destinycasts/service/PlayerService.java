@@ -221,4 +221,11 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
             updaterThread.interrupt();
         }
     }
+
+//    public int getTotalTrackTime() {
+//        if (mMediaPlayer != null) {
+//            return mMediaPlayer.getDuration();
+//        }
+//        return 0;
+//    }
 }

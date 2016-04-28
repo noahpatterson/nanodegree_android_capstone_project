@@ -52,6 +52,7 @@ public class PodcastContract {
         public static final String COLUMN_URL = "mp3_url";
         public static final String COLUMN_PODCAST_ID = "podcast_id";
         public static final String COLUMN_PODCAST_TITLE = "podcast_title";
+        public static final String COLUMN_EPISODE_LENGTH = "episode_length";
 
         // create content uri
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()

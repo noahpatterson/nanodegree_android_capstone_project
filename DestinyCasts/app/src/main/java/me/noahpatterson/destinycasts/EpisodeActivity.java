@@ -44,6 +44,7 @@ public class EpisodeActivity extends AppCompatActivity {
     private boolean hasService = false;
     private static final String LOG = "PlayerFragment";
 
+    private int totalTrackLength;
     // Service broacast constants
     public static final String ACTION_PLAY_TRACK = "me.noahpatterson.destinycasts.PLAY_TRACK";
     public static final String ACTION_PAUSE_TRACK = "me.noahpatterson.destinycasts.PAUSE_TRACK";
@@ -94,7 +95,8 @@ public class EpisodeActivity extends AppCompatActivity {
                             PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL,
                             PodcastContract.EpisodeEntry.COLUMN_PUB_DATE,
                             PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION,
-                            PodcastContract.EpisodeEntry.COLUMN_URL
+                            PodcastContract.EpisodeEntry.COLUMN_URL,
+                            PodcastContract.EpisodeEntry.COLUMN_EPISODE_LENGTH
                     },
                     PodcastContract.EpisodeEntry._ID + "=?",
                     new String[] {
@@ -138,6 +140,10 @@ public class EpisodeActivity extends AppCompatActivity {
                 //url
                 int episodeUrlIndex = c.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_URL);
                 episodeUrl = c.getString(episodeUrlIndex);
+
+                //episode length
+                int episodeLengthIndex = c.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_EPISODE_LENGTH);
+                totalTrackLength = c.getInt(episodeLengthIndex) * 1000;
             }
             c.close();
         }
@@ -194,14 +200,19 @@ public class EpisodeActivity extends AppCompatActivity {
         //assign trackDuration
         //TODO: this should really be the preview track length, possibly obtained from mediaPlayer
         seekBar = (SeekBar) findViewById(R.id.playerSeekBar);
-        seekBar.setMax(30 * 1000);
+        trackTimeTextView = (TextView) findViewById(R.id.playerCurrentTrackPosition);
+        TextView trackTimeTotalTextView = (TextView) findViewById(R.id.playerTotalTrackTime);
+        String formattedDuration = new SimpleDateFormat("hh:mm:ss").format(new Date(totalTrackLength));
+        trackTimeTotalTextView.setText(formattedDuration);
+//        seekBar.setMax(PlayerService.totalTrackTime);
+//        seekBar.setMax(30 * 1000);
+        seekBar.setMax(totalTrackLength);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
 
                     String formattedDuration = new SimpleDateFormat("mm:ss").format(new Date(progress));
-                    trackTimeTextView = (TextView) findViewById(R.id.playerCurrentTrackPosition);
                     trackTimeTextView.setText(formattedDuration);
 
                     // if the track is playing we need to tell the playerService to scrub the track
@@ -246,9 +257,9 @@ public class EpisodeActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(playerCompleteReciever, playerCompleteFilter);
 
         //auto start track
-        if (!playing && !episodeUrl.equals(playingURL)) {
-            playTrack();
-        }
+//        if (!playing && !episodeUrl.equals(playingURL)) {
+//            playTrack();
+//        }
     }
 
     @Override
@@ -354,7 +365,7 @@ public class EpisodeActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             playButton.setImageResource(android.R.drawable.ic_media_play);
             seekBar.setProgress(0);
-            trackTimeTextView.setText("00:00");
+            trackTimeTextView.setText(getString(R.string.trackStartTime));
             playing = false;
             seek = 0;
         }
