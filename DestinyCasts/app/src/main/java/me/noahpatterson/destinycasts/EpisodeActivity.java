@@ -12,6 +12,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -31,6 +32,7 @@ import me.noahpatterson.destinycasts.data.PodcastContract;
 import me.noahpatterson.destinycasts.data.PodcastDBHelper;
 
 public class EpisodeActivity extends AppCompatActivity {
+    private static final int ONE_MILLI_SECOND = 1000;
     private Context context;
 
 //    private ParcelableTrack parcelableTrack = null;
@@ -143,7 +145,7 @@ public class EpisodeActivity extends AppCompatActivity {
 
                 //episode length
                 int episodeLengthIndex = c.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_EPISODE_LENGTH);
-                totalTrackLength = c.getInt(episodeLengthIndex) * 1000;
+                totalTrackLength = c.getInt(episodeLengthIndex);
             }
             c.close();
         }
@@ -202,17 +204,21 @@ public class EpisodeActivity extends AppCompatActivity {
         seekBar = (SeekBar) findViewById(R.id.playerSeekBar);
         trackTimeTextView = (TextView) findViewById(R.id.playerCurrentTrackPosition);
         TextView trackTimeTotalTextView = (TextView) findViewById(R.id.playerTotalTrackTime);
-        String formattedDuration = new SimpleDateFormat("hh:mm:ss").format(new Date(totalTrackLength));
+//        String formattedDuration = new SimpleDateFormat("h:mm:ss").format(new Date(totalTrackLength*1000));
+        String formattedDuration = DateUtils.formatElapsedTime(totalTrackLength);
         trackTimeTotalTextView.setText(formattedDuration);
+
 //        seekBar.setMax(PlayerService.totalTrackTime);
 //        seekBar.setMax(30 * 1000);
-        seekBar.setMax(totalTrackLength);
+        seekBar.setMax(totalTrackLength * ONE_MILLI_SECOND);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.d(LOG, "inOnProgressChanged");
                 if (fromUser) {
 
-                    String formattedDuration = new SimpleDateFormat("mm:ss").format(new Date(progress));
+//                    String formattedDuration = new SimpleDateFormat("h:mm:ss").format(new Date(progress));
+                    String formattedDuration = DateUtils.formatElapsedTime(progress/ONE_MILLI_SECOND);
                     trackTimeTextView.setText(formattedDuration);
 
                     // if the track is playing we need to tell the playerService to scrub the track
@@ -229,10 +235,12 @@ public class EpisodeActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                Log.d(LOG, "onStartTrackingTouch");
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.d(LOG, "onStopTrackingTouch");
             }
         });
     }
@@ -348,7 +356,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 playButton.setImageResource(android.R.drawable.ic_media_pause);
                 seekBar.setProgress(currPosition);
 
-                String formattedDuration = new SimpleDateFormat("mm:ss").format(new Date(currPosition));
+                String formattedDuration = DateUtils.formatElapsedTime(currPosition/ONE_MILLI_SECOND);
                 trackTimeTextView.setText(formattedDuration);
                 playing = true;
 
