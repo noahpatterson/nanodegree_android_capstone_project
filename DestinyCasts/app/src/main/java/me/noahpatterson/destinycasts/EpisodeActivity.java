@@ -60,8 +60,13 @@ public class EpisodeActivity extends AppCompatActivity {
     public static final String CURRENT_TRACK_LIST_POSITION = "currentPosition";
     public static final String IS_PLAYING = "playing";
 
-    //episode url
+    //episode data
     private String episodeUrl;
+    private String episodeName;
+    private String podcastTitle;
+    private int podcastID;
+
+    //play area
     private ImageButton playButton;
     private SeekBar seekBar;
     private TextView trackTimeTextView;
@@ -85,7 +90,7 @@ public class EpisodeActivity extends AppCompatActivity {
 
         context = this;
 
-        int podcastID = getIntent().getIntExtra("podcast_id", 0);
+        podcastID = getIntent().getIntExtra("podcast_id", 0);
         if (podcastID != -1) {
             PodcastDBHelper dbHelper = new PodcastDBHelper(this);
             SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -109,7 +114,7 @@ public class EpisodeActivity extends AppCompatActivity {
 
                 //podcast title
                 int podcastTitleIndex = c.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE);
-                final String podcastTitle = c.getString(podcastTitleIndex);
+                podcastTitle = c.getString(podcastTitleIndex);
 
                 //image
                 int imageIndex = c.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL);
@@ -120,7 +125,7 @@ public class EpisodeActivity extends AppCompatActivity {
 
                 //title
                 int episodeIndex = c.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_TITLE);
-                final String episodeName = c.getString(episodeIndex);
+                episodeName = c.getString(episodeIndex);
                 TextView episodeTitle = (TextView) findViewById(R.id.episodeDetailTitle);
                 episodeTitle.setText(episodeName);
 
@@ -176,6 +181,9 @@ public class EpisodeActivity extends AppCompatActivity {
         if (!hasService) {
             Intent startPlayerService = new Intent(this, PlayerService.class);
             startPlayerService.putExtra(TRACK_PREVIEW_URL, episodeUrl);
+            startPlayerService.putExtra(PlayerService.EPISODE_NAME, episodeName);
+            startPlayerService.putExtra(PlayerService.PODCAST_TITLE, podcastTitle);
+            startPlayerService.putExtra(PlayerService.PODCAST_ID, podcastID);
             startService(startPlayerService);
         }
 

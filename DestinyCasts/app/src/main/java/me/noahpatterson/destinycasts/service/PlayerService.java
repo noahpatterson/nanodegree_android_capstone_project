@@ -1,21 +1,31 @@
 package me.noahpatterson.destinycasts.service;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.bumptech.glide.Glide;
 
 import java.io.IOException;
 import java.util.Random;
 
 import me.noahpatterson.destinycasts.EpisodeActivity;
+import me.noahpatterson.destinycasts.R;
+import me.noahpatterson.destinycasts.Utilities;
+import me.noahpatterson.destinycasts.WeeklyListActivity;
 
 public class PlayerService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
     public static final String ACTION_CURR_POSITION = "me.noahpatterson.destinycasts.CURR_POSITION";
@@ -31,6 +41,17 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     // Intent String Constants
     public static final String CURR_TRACK_POSITION = "current_track_position";
     public static final String PLAYING_URL = "playingURL";
+    public static final String EPISODE_NAME = "EPISODE_NAME";
+    public static final String PODCAST_TITLE = "PODCAST_TITLE";
+    public static final String PODCAST_ID = "PODCAST_ID";
+
+    //player data
+    private String episodeName;
+    private String podcastTitle;
+    private int podcastId;
+
+    //player notification id
+    private static int NOTIFICATION_ID = 101;
 
     // this controls updating the seekBar and time while playing
     private void startUpdater() {
@@ -102,6 +123,12 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         Log.d(LOG, "in onStartCommand: " + name);
         // moved normal implementation to the broadcast receivers because it seems easier to manipulate
         String previewURL = intent.getStringExtra(EpisodeActivity.TRACK_PREVIEW_URL);
+
+        //get player data
+        episodeName = intent.getStringExtra(EPISODE_NAME);
+        podcastTitle = intent.getStringExtra(PODCAST_TITLE);
+        podcastId = intent.getIntExtra(PODCAST_ID, 0);
+
         try {
             mMediaPlayer.setDataSource(previewURL);
         } catch(IllegalArgumentException e) {
@@ -139,6 +166,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
             playingURL = previewURL;
             seek = intent.getIntExtra(EpisodeActivity.SEEK_POSITION, 0);
         }
+        showNotification();
     }
 
     private BroadcastReceiver playTrackReciever = new BroadcastReceiver() {
@@ -179,9 +207,9 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     @Override
     public void onPrepared(MediaPlayer player) {
         Log.d(LOG, "in onPrepared: "+ name);
-        player.seekTo(seek);
-        notifyStart();
-        player.start();
+//        player.seekTo(seek);
+//        notifyStart();
+//        player.start();
     }
 
     @Override
@@ -205,6 +233,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         // send a track completed broadcast to the fragment
         Intent playerComplete = new Intent(ACTION_COMPLETE);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(playerComplete);
+        stopForeground(true);
     }
 
     @Override
@@ -220,6 +249,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         if (updaterThread != null) {
             updaterThread.interrupt();
         }
+        stopForeground(true);
     }
 
 //    public int getTotalTrackTime() {
@@ -228,4 +258,43 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 //        }
 //        return 0;
 //    }
+
+    private void showNotification() {
+        // The PendingIntent to launch our activity if the user selects this notification
+        Intent contentIntent = new Intent(this, EpisodeActivity.class);
+        contentIntent.putExtra("podcast_id", podcastId);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(EpisodeActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(contentIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        Bitmap largePodcastIcon = BitmapFactory.decodeResource(getResources(),
+                Utilities.findPodcastImage(podcastTitle));
+
+        // Set the info for the views that show in the notification panel.
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
+//                .setTicker(text)  // the status text
+//                .setWhen(System.currentTimeMillis())  // the time stamp
+                .setLargeIcon(largePodcastIcon)
+                .setContentTitle(episodeName)  // the label of the entry
+                .setContentText(podcastTitle)  // the contents of the entry
+                .setContentIntent(resultPendingIntent)  // The intent to send when the entry is clicked
+                .build();
+
+        // Send the notification.
+        startForeground(NOTIFICATION_ID,
+                notification);
+    }
 }
