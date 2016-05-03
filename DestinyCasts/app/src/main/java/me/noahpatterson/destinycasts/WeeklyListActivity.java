@@ -95,7 +95,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         }
 
         //only refresh once per day
-        todaysDateInMilli = getStartOfDayInMillis();
+        todaysDateInMilli = Utilities.getStartOfDayInMillis();
         if (preferences.getLong("refreshed_date", 0) < todaysDateInMilli){
             refreshPodcasts();
             preferences.edit()
@@ -167,15 +167,6 @@ public class WeeklyListActivity extends AppCompatActivity {
 
     private void refreshPodcasts(){
         FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
-    }
-
-    public long getStartOfDayInMillis() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTimeInMillis();
     }
 
     @Override
