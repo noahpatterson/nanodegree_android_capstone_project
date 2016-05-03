@@ -48,6 +48,9 @@ public class ChooseIntroActivity extends AppCompatActivity {
         // Set onboarding_complete to true
         preferences.edit()
                 .putBoolean("onboarding_complete",true).apply();
+        //changed settings, now refresh podcasts by changing the last refreshed date
+        preferences.edit()
+                .putLong("refreshed_date", Utilities.getStartOfDayInMillis()-1).apply();
 
         // Launch the main Activity, called MainActivity
         Intent main = new Intent(this, WeeklyListActivity.class);
