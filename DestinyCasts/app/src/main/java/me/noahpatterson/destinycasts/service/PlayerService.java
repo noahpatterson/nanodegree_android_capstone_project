@@ -37,7 +37,6 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     private int seek = 0;
     private String LOG = "player service";
 
-
     // Intent String Constants
     public static final String CURR_TRACK_POSITION = "current_track_position";
     public static final String PLAYING_URL = "playingURL";

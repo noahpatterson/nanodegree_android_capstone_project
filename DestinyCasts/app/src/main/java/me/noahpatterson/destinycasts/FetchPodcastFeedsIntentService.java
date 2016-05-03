@@ -41,8 +41,10 @@ import okhttp3.Response;
  */
 public class FetchPodcastFeedsIntentService extends IntentService {
     private static final String ACTION_FETCH_NEW_FEED_ITEMS = "me.noahpatterson.destinycasts.action.FETCH_NEW";
-
+    public static final String BROADCAST_ACTION_STATE_CHANGE = "me.noahpatterson.destinycasts.BROADCAST_ACTION_STATE_CHANGE";
     private static final String FEED_URL_PARAM = "me.noahpatterson.destinycasts.extra.FEED_URL_PARAM";
+    public static final String EXTRA_REFRESHING = "EXTRA_REFRESHING";
+
     private static final String LOG_TAG = "FeedsIntentService";
     private static Context mContext;
     private static long ONE_DAY_IN_MILLI = 86400000;
@@ -64,15 +66,12 @@ public class FetchPodcastFeedsIntentService extends IntentService {
         int favoriteLength = 0;
         for(int i =0;i < podcastList.size();i++) {
             Podcast podcast = podcastList.get(i);
-//            if (podcast.isSelected) {
                 favorites.add(favoriteLength, podcast.rssFeedUrlString);
                 favoriteLength++;
-//            }
         }
 
         Intent intent = new Intent(context, FetchPodcastFeedsIntentService.class);
         intent.setAction(ACTION_FETCH_NEW_FEED_ITEMS);
-//        intent.putExtra(FEED_URL_PARAM, favorites.get(0));
         intent.putStringArrayListExtra(FEED_URL_PARAM, favorites);
         context.startService(intent);
     }
@@ -80,6 +79,7 @@ public class FetchPodcastFeedsIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        sendIsRefreshing();
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_FETCH_NEW_FEED_ITEMS.equals(action)) {
@@ -93,7 +93,6 @@ public class FetchPodcastFeedsIntentService extends IntentService {
         OkHttpClient client = new OkHttpClient();
 
         try {
-
             //loop through favorite podcast urls
             for(String feedUrl : feedUrls) {
                 Log.d(LOG_TAG, "Feedurl = " + feedUrl);
@@ -106,7 +105,6 @@ public class FetchPodcastFeedsIntentService extends IntentService {
 
                 insertData(feed);
             }
-
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
         } catch (XmlPullParserException e) {
@@ -114,8 +112,7 @@ public class FetchPodcastFeedsIntentService extends IntentService {
         } catch (DataFormatException e) {
             Log.e(LOG_TAG, "DataFormatException ", e);
         }
-
-
+        sendIsNotRefreshing();
     }
 
     // insert data into database
@@ -195,12 +192,10 @@ public class FetchPodcastFeedsIntentService extends IntentService {
         }
 
         podcastCursor.close();
-        // Wait, that worked?  Yes!
         return podcastId;
     }
 
-    String getCorrectMp3Url(RSSItem episode) {
-//        episodeRssItem.media == null ? episodeRssItem.getLink() : episodeRssItem.media.contents.get(0).url.toString())
+    private String getCorrectMp3Url(RSSItem episode) {
         String link = episode.getLink();
         MediaItem media = episode.media;
         List<RSSEnclosure> enclosuresList = episode.enclosures;
@@ -221,5 +216,13 @@ public class FetchPodcastFeedsIntentService extends IntentService {
         }
         Log.e(LOG_TAG, "cannot find episode url");
         return "";
+    }
+
+    private void sendIsRefreshing() {
+        sendBroadcast(new Intent(BROADCAST_ACTION_STATE_CHANGE).putExtra(EXTRA_REFRESHING, true));
+    }
+
+    private void sendIsNotRefreshing() {
+        sendBroadcast(new Intent(BROADCAST_ACTION_STATE_CHANGE).putExtra(EXTRA_REFRESHING, false));
     }
 }

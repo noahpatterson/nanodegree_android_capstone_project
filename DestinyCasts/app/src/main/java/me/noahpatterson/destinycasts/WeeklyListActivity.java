@@ -1,15 +1,17 @@
 package me.noahpatterson.destinycasts;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.text.TextUtilsCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,7 +22,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,13 +31,13 @@ import android.view.ViewGroup;
 
 import com.facebook.stetho.Stetho;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import me.noahpatterson.destinycasts.data.PodcastContract;
-import me.noahpatterson.destinycasts.data.PodcastDBHelper;
 import me.noahpatterson.destinycasts.model.Podcast;
+import me.noahpatterson.destinycasts.service.PlayerService;
 
 public class WeeklyListActivity extends AppCompatActivity {
 
@@ -49,16 +50,32 @@ public class WeeklyListActivity extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private EpisodeAdapter mEpisodeAdapters;
     private static List<Podcast> podcastList;
     private static List<Podcast> favPodcastList;
 
     private static long ONE_DAY_IN_MILLI = 86400000;
+    private static long todaysDateInMilli;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private boolean mIsRefreshing = false;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(mRefreshingReceiver,
+                new IntentFilter(FetchPodcastFeedsIntentService.BROADCAST_ACTION_STATE_CHANGE));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(mRefreshingReceiver);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +84,6 @@ public class WeeklyListActivity extends AppCompatActivity {
         //call the Rss lookup as fast as possible
         //get all podcast list
         podcastList = Arrays.asList(Utilities.podcastsList);
-        FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
 
         // Get the shared preferences
         SharedPreferences preferences =  getSharedPreferences("my_preferences", MODE_PRIVATE);
@@ -75,8 +91,15 @@ public class WeeklyListActivity extends AppCompatActivity {
         // Check if onboarding_complete is false
         if(!preferences.getBoolean("onboarding_complete",false)) {
             startOnboarding();
-
             return;
+        }
+
+        //only refresh once per day
+        todaysDateInMilli = getStartOfDayInMillis();
+        if (preferences.getLong("refreshed_date", 0) < todaysDateInMilli){
+            refreshPodcasts();
+            preferences.edit()
+                    .putLong("refreshed_date", todaysDateInMilli).apply();
         }
 
         //get podcast favorites
@@ -110,15 +133,28 @@ public class WeeklyListActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshPodcasts();
+            }
+        });
     }
+
+    //handle refresh action
+    private void updateRefreshingUI() {
+        mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
+    }
+    private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (FetchPodcastFeedsIntentService.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
+                mIsRefreshing = intent.getBooleanExtra(FetchPodcastFeedsIntentService.EXTRA_REFRESHING, false);
+                updateRefreshingUI();
+            }
+        }
+    };
 
     private void startOnboarding() {
         // Start the onboarding Activity
@@ -129,6 +165,18 @@ public class WeeklyListActivity extends AppCompatActivity {
         finish();
     }
 
+    private void refreshPodcasts(){
+        FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
+    }
+
+    public long getStartOfDayInMillis() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -217,7 +265,6 @@ public class WeeklyListActivity extends AppCompatActivity {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             Log.d("weeklyList", "in onCreateLoader");
-            long todaysDateInMilli = System.currentTimeMillis();
             int weekPageNumber = this.getArguments().getInt(ARG_WEEK_NUMBER);
             StringBuilder sb = new StringBuilder();
             if (favPodcastList != null) {
