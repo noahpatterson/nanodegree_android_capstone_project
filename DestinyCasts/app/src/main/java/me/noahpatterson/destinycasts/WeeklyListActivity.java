@@ -32,7 +32,6 @@ import android.view.ViewGroup;
 import com.facebook.stetho.Stetho;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import me.noahpatterson.destinycasts.data.PodcastContract;
@@ -54,6 +53,7 @@ public class WeeklyListActivity extends AppCompatActivity {
     private EpisodeAdapter mEpisodeAdapters;
     private static List<Podcast> podcastList;
     private static List<Podcast> favPodcastList;
+    private static final String LOG_TAG = "weeklyList";
 
     private static long ONE_DAY_IN_MILLI = 86400000;
     private static long todaysDateInMilli;
@@ -204,7 +204,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         private static final String ARG_WEEK_NUMBER = "week_number";
         private EpisodeAdapter mEpisodeAdapters;
         private RecyclerView mRecyclerView;
-
+        private static final String LOG_TAG = "EpisodeFragment";
         public EpisodeFragment() {
         }
 
@@ -262,7 +262,7 @@ public class WeeklyListActivity extends AppCompatActivity {
                 for (int i = 0; i < favPodcastList.size(); i++) {
                     Podcast podcast = favPodcastList.get(i);
                     if (podcast.isSelected) {
-                        sb.append("\"" + podcast.name + "\",");
+                        sb.append("\"").append(podcast.name).append("\",");
                     }
                 }
                 sb.deleteCharAt(sb.length() - 1);
@@ -275,7 +275,7 @@ public class WeeklyListActivity extends AppCompatActivity {
             switch (weekPageNumber) {
                 case 0:
 //                    return "This Week";
-                    Log.d("weeklyList", "in this week");
+                    Log.d(LOG_TAG, "in this week");
                     return new CursorLoader(getActivity(),
                             PodcastContract.EpisodeEntry.CONTENT_URI,
                             new String[] {
@@ -291,7 +291,7 @@ public class WeeklyListActivity extends AppCompatActivity {
                             null);
                 case 1:
 //                    return "Last Week";
-                    Log.d("weeklyList", "in last week");
+                    Log.d(LOG_TAG, "in last week");
                     return new CursorLoader(getActivity(),
                             PodcastContract.EpisodeEntry.CONTENT_URI,
                             new String[] {
@@ -312,13 +312,13 @@ public class WeeklyListActivity extends AppCompatActivity {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            Log.d("weeklyList", "in onLoadFinished");
+            Log.d(LOG_TAG, "in onLoadFinished");
             mEpisodeAdapters.swapCursor(data);
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-            Log.d("weeklyList", "in onLoaderReset");
+            Log.d(LOG_TAG, "in onLoaderReset");
             mEpisodeAdapters.swapCursor(null);
         }
     }
@@ -356,5 +356,11 @@ public class WeeklyListActivity extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "in onDestory");
+        super.onDestroy();
     }
 }

@@ -24,7 +24,6 @@ import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import me.noahpatterson.destinycasts.service.PlayerService;
@@ -35,16 +34,11 @@ public class EpisodeActivity extends AppCompatActivity {
     private static final int ONE_MILLI_SECOND = 1000;
     private Context context;
 
-//    private ParcelableTrack parcelableTrack = null;
     private Boolean playing = false;
     private String playingURL;
     private int seek = 0;
-    private View fragmentView;
-//    private ArrayList<ParcelableTrack> mParcelableTrackArrayList;
-    private int mCurrentTrackPosition;
-//    private PlayerViewHolder mPlayerViewHolder;
     private boolean hasService = false;
-    private static final String LOG = "PlayerFragment";
+    private static final String LOG = "EpisodeActivity";
 
     private int totalTrackLength;
     // Service broacast constants
@@ -56,8 +50,6 @@ public class EpisodeActivity extends AppCompatActivity {
 
     // onSaveInstantState constants
     public static final String PLAYING_URL = "playingURL";
-    public static final String CURR_TRACK = "parcelableTrack";
-    public static final String CURRENT_TRACK_LIST_POSITION = "currentPosition";
     public static final String IS_PLAYING = "playing";
 
     //episode data
@@ -153,18 +145,14 @@ public class EpisodeActivity extends AppCompatActivity {
                 totalTrackLength = c.getInt(episodeLengthIndex);
             }
             c.close();
+            db.close();
         }
 
         //setting up player
         if (savedInstanceState != null) {
             playing = savedInstanceState.getBoolean(IS_PLAYING, false);
             playingURL = savedInstanceState.getString(PLAYING_URL, null);
-//            parcelableTrack = savedInstanceState.getParcelable(CURR_TRACK);
-//            mCurrentTrackPosition = savedInstanceState.getInt(CURRENT_TRACK_LIST_POSITION);
             seek = savedInstanceState.getInt(SEEK_POSITION);
-        } else {
-//            parcelableTrack = getIntent().getParcelableExtra(TopTracksFragment.CURR_TRACK);
-//            mCurrentTrackPosition = getActivity().getIntent().getIntExtra(TopTracksFragment.CURRENT_TRACK_LIST_POSITION, 0);
         }
 
         // here we make sure only to start 1 playerService at a time
@@ -187,9 +175,6 @@ public class EpisodeActivity extends AppCompatActivity {
             startService(startPlayerService);
         }
 
-        //assign trackDuration
-        //TODO: this should really be the preview track length, possibly obtained from mediaPlayer
-
         // make sure the play button is in the right state
         playButton = (ImageButton) findViewById(R.id.playerPlayButton);
         if (playing) {
@@ -208,16 +193,12 @@ public class EpisodeActivity extends AppCompatActivity {
 
         //set seekBar change listener
         //assign trackDuration
-        //TODO: this should really be the preview track length, possibly obtained from mediaPlayer
         seekBar = (SeekBar) findViewById(R.id.playerSeekBar);
         trackTimeTextView = (TextView) findViewById(R.id.playerCurrentTrackPosition);
         TextView trackTimeTotalTextView = (TextView) findViewById(R.id.playerTotalTrackTime);
-//        String formattedDuration = new SimpleDateFormat("h:mm:ss").format(new Date(totalTrackLength*1000));
         String formattedDuration = DateUtils.formatElapsedTime(totalTrackLength);
         trackTimeTotalTextView.setText(formattedDuration);
 
-//        seekBar.setMax(PlayerService.totalTrackTime);
-//        seekBar.setMax(30 * 1000);
         seekBar.setMax(totalTrackLength * ONE_MILLI_SECOND);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -225,7 +206,6 @@ public class EpisodeActivity extends AppCompatActivity {
                 Log.d(LOG, "inOnProgressChanged");
                 if (fromUser) {
 
-//                    String formattedDuration = new SimpleDateFormat("h:mm:ss").format(new Date(progress));
                     String formattedDuration = DateUtils.formatElapsedTime(progress/ONE_MILLI_SECOND);
                     trackTimeTextView.setText(formattedDuration);
 
@@ -271,11 +251,6 @@ public class EpisodeActivity extends AppCompatActivity {
 
         IntentFilter playerCompleteFilter = new IntentFilter(PlayerService.ACTION_COMPLETE);
         LocalBroadcastManager.getInstance(this).registerReceiver(playerCompleteReciever, playerCompleteFilter);
-
-        //auto start track
-//        if (!playing && !episodeUrl.equals(playingURL)) {
-//            playTrack();
-//        }
     }
 
     @Override
@@ -294,14 +269,6 @@ public class EpisodeActivity extends AppCompatActivity {
 
         // save whether the track is playing
         outState.putBoolean(IS_PLAYING, playing);
-
-        //if we have a track, store it's data
-//        if (parcelableTrack != null) {
-//            outState.putString(PLAYING_URL, parcelableTrack.previewURL);
-//            outState.putParcelable(CURR_TRACK, parcelableTrack);
-//            outState.putInt(CURRENT_TRACK_LIST_POSITION, mCurrentTrackPosition);
-//            outState.putInt(SEEK_POSITION, seek);
-//        }
         super.onSaveInstanceState(outState);
     }
 
@@ -332,9 +299,6 @@ public class EpisodeActivity extends AppCompatActivity {
 
             // swap the pause button to play
             playButton.setImageResource(android.R.drawable.ic_media_play);
-
-            // store the track's playing position
-//            seek = mPlayerViewHolder.seekBar.getProgress();
         }
 
         // otherwise we start the selected track
@@ -353,9 +317,7 @@ public class EpisodeActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // PlayerService knows what it is playing so we update the view
-//            if (playingURL == null) {
             playingURL = intent.getStringExtra(PlayerService.PLAYING_URL);
-//            }
 
             // only update the seekbar and trackTime if we're viewing the playing track
             if (episodeUrl.equals(playingURL)) {

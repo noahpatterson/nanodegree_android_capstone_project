@@ -16,6 +16,7 @@ import android.os.IBinder;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.bumptech.glide.Glide;
 
@@ -259,6 +260,9 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 //    }
 
     private void showNotification() {
+        //setup custom notification layout
+        RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.player_notification);
+
         // The PendingIntent to launch our activity if the user selects this notification
         Intent contentIntent = new Intent(this, EpisodeActivity.class);
         contentIntent.putExtra("podcast_id", podcastId);
