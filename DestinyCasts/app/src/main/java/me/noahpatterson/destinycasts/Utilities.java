@@ -60,11 +60,11 @@ public class Utilities {
             case "Ghost Stories, a Destiny Podcast":
                 return R.drawable.destiny_ghost_stories;
             case "Fireteam Chat: IGN's Destiny Podcast":
-                return R.drawable.crucible_radio;
+                return R.drawable.fireteam_chat;
             case "Guardian Radio":
                 return R.drawable.guardian_radio;
             case "Crucible Radio":
-                return R.drawable.fireteam_chat;
+                return R.drawable.crucible_radio;
             default:
                 return 0;
         }

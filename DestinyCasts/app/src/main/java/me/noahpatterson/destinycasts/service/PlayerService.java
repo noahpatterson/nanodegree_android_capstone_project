@@ -1,6 +1,7 @@
 package me.noahpatterson.destinycasts.service;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -31,6 +32,9 @@ import me.noahpatterson.destinycasts.WeeklyListActivity;
 public class PlayerService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
     public static final String ACTION_CURR_POSITION = "me.noahpatterson.destinycasts.CURR_POSITION";
     public static final String ACTION_COMPLETE = "me.noahpatterson.destinycasts.CURR_COMPLETE";
+    private static final String ACTION_CLOSE = "me.noahpatterson.destinycasts.CLOSE";
+    public static final String ACTION_PLAY = "action_play";
+    public static final String ACTION_PAUSE = "action_pause";
     private MediaPlayer mMediaPlayer;
     private String playingURL = null;
     private Thread updaterThread;
@@ -121,6 +125,44 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(LOG, "in onStartCommand: " + name);
+
+        //handle close intent if present
+        if (intent.getAction() != null) {
+            switch (intent.getAction()) {
+                case PlayerService.ACTION_CLOSE:
+                    updaterThread.interrupt();
+                    playingURL = null;
+                    mMediaPlayer.reset();
+
+                    // send a track completed broadcast to the fragment
+                    Intent playerComplete = new Intent(ACTION_COMPLETE);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(playerComplete);
+                    stopForeground(true);
+                    stopSelf();
+                    return 1;
+                case PlayerService.ACTION_PLAY:
+                    Intent playingIntent = new Intent(this,PlayerService.class);
+                    playingIntent.putExtra(EpisodeActivity.SEEK_POSITION, mMediaPlayer.getCurrentPosition());
+                    playTrack(playingIntent,playingURL);
+
+                    //send playing to fragment
+                    Intent playerPlaying = new Intent(ACTION_PLAY);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(playerPlaying);
+                    showNotification();
+                    return 1;
+                case PlayerService.ACTION_PAUSE:
+                    mMediaPlayer.pause();
+                    updaterThread.interrupt();
+
+                    //send pause to fragment
+                    Intent playerPaused = new Intent(ACTION_PAUSE);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(playerPaused);
+                    showNotification();
+                    return 1;
+            }
+
+        }
+
         // moved normal implementation to the broadcast receivers because it seems easier to manipulate
         String previewURL = intent.getStringExtra(EpisodeActivity.TRACK_PREVIEW_URL);
 
@@ -163,6 +205,9 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
             }
 
             mMediaPlayer.prepareAsync(); // prepare async to not block main thread
+            notifyStart();
+//            mMediaPlayer.start();
+
             playingURL = previewURL;
             seek = intent.getIntExtra(EpisodeActivity.SEEK_POSITION, 0);
         }
@@ -207,9 +252,15 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     @Override
     public void onPrepared(MediaPlayer player) {
         Log.d(LOG, "in onPrepared: "+ name);
-//        player.seekTo(seek);
-//        notifyStart();
-//        player.start();
+        player.seekTo(seek);
+        notifyStart();
+        player.start();
+//        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//            @Override
+//            public void onPrepared(MediaPlayer mp) {
+//                mMediaPlayer.start();
+//            }
+//        });
     }
 
     @Override
@@ -260,8 +311,46 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 //    }
 
     private void showNotification() {
+        Bitmap largePodcastIcon = BitmapFactory.decodeResource(getResources(),
+                Utilities.findPodcastImage(podcastTitle));
         //setup custom notification layout
         RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.player_notification);
+        remoteViews.setImageViewBitmap(R.id.episodeNotficationImageView,largePodcastIcon);
+        remoteViews.setTextViewText(R.id.notificationEpisodeName, episodeName);
+        remoteViews.setTextViewText(R.id.notificationPodcastName, podcastTitle);
+
+        //create close/stop service pending intent
+        Intent deleteIntent = new Intent(this, PlayerService.class);
+        deleteIntent.setAction(PlayerService.ACTION_CLOSE);
+        PendingIntent deletePendingIntent = PendingIntent.getService(this,
+                0,
+                deleteIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.closeNotificationButton, deletePendingIntent);
+
+        //create play pending intent
+        Intent playIntent = new Intent(this, PlayerService.class);
+        playIntent.setAction(PlayerService.ACTION_PLAY);
+        PendingIntent playPendingIntent = PendingIntent.getService(this,
+                0,
+                playIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //create pause pending intent
+        Intent pauseIntent = new Intent(this, PlayerService.class);
+        pauseIntent.setAction(PlayerService.ACTION_PAUSE);
+        PendingIntent pausePendingIntent = PendingIntent.getService(this,
+                0,
+                pauseIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if (mMediaPlayer.isPlaying()) {
+            remoteViews.setImageViewResource(R.id.notificationPlayPauseButton, android.R.drawable.ic_media_pause);
+            remoteViews.setOnClickPendingIntent(R.id.notificationPlayPauseButton, pausePendingIntent);
+        } else {
+            remoteViews.setImageViewResource(R.id.notificationPlayPauseButton, android.R.drawable.ic_media_play);
+            remoteViews.setOnClickPendingIntent(R.id.notificationPlayPauseButton, playPendingIntent);
+        }
 
         // The PendingIntent to launch our activity if the user selects this notification
         Intent contentIntent = new Intent(this, EpisodeActivity.class);
@@ -282,19 +371,20 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
-        Bitmap largePodcastIcon = BitmapFactory.decodeResource(getResources(),
-                Utilities.findPodcastImage(podcastTitle));
+
 
         // Set the info for the views that show in the notification panel.
         Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
 //                .setTicker(text)  // the status text
 //                .setWhen(System.currentTimeMillis())  // the time stamp
-                .setLargeIcon(largePodcastIcon)
-                .setContentTitle(episodeName)  // the label of the entry
-                .setContentText(podcastTitle)  // the contents of the entry
+//                .setLargeIcon(largePodcastIcon)
+//                .setContentTitle(episodeName)  // the label of the entry
+//                .setContentText(podcastTitle)  // the contents of the entry
                 .setContentIntent(resultPendingIntent)  // The intent to send when the entry is clicked
+                .setContent(remoteViews)
                 .build();
+        notification.bigContentView =remoteViews;
 
         // Send the notification.
         startForeground(NOTIFICATION_ID,

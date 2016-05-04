@@ -251,6 +251,12 @@ public class EpisodeActivity extends AppCompatActivity {
 
         IntentFilter playerCompleteFilter = new IntentFilter(PlayerService.ACTION_COMPLETE);
         LocalBroadcastManager.getInstance(this).registerReceiver(playerCompleteReciever, playerCompleteFilter);
+
+        IntentFilter playerPauseFilter = new IntentFilter(PlayerService.ACTION_PAUSE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(playerPauseReciever, playerPauseFilter);
+
+        IntentFilter playerPlayFilter = new IntentFilter(PlayerService.ACTION_PLAY);
+        LocalBroadcastManager.getInstance(this).registerReceiver(playerPlayReciever, playerPlayFilter);
     }
 
     @Override
@@ -261,6 +267,8 @@ public class EpisodeActivity extends AppCompatActivity {
         // trash the playerService receivers
         LocalBroadcastManager.getInstance(this).unregisterReceiver(currPositionReciever);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(playerCompleteReciever);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(playerPauseReciever);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(playerPlayReciever);
     }
 
     @Override
@@ -346,6 +354,22 @@ public class EpisodeActivity extends AppCompatActivity {
             trackTimeTextView.setText(getString(R.string.trackStartTime));
             playing = false;
             seek = 0;
+        }
+    };
+
+    private BroadcastReceiver playerPauseReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            playButton.setImageResource(android.R.drawable.ic_media_play);
+            playing = false;
+        }
+    };
+
+    private BroadcastReceiver playerPlayReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            playButton.setImageResource(android.R.drawable.ic_media_pause);
+            playing = true;
         }
     };
 
