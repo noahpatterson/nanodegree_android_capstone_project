@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -19,8 +20,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -65,6 +70,7 @@ public class EpisodeActivity extends AppCompatActivity {
     private ImageButton playButton;
     private SeekBar seekBar;
     private TextView trackTimeTextView;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -298,6 +304,8 @@ public class EpisodeActivity extends AppCompatActivity {
     public void playTrack() {
         Log.d(LOG, "in playTrack");
 
+
+
         // if playing and the current selected track's URL matches the PlayingURL we pause the track
         if (playing && episodeUrl.equals(playingURL)) {
 
@@ -323,6 +331,17 @@ public class EpisodeActivity extends AppCompatActivity {
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
             playingURL = episodeUrl;
             playButton.setImageResource(android.R.drawable.ic_media_pause);
+
+            //show ad every other play - DEV ONLY - in production this should be every 4th play
+            SharedPreferences preferences =  getSharedPreferences("my_preferences", MODE_PRIVATE);
+            int numberPlays = preferences.getInt("number_play_clicks_for_ad", 1);
+            if (numberPlays >= 2) {
+                preferences.edit().putInt("number_play_clicks_for_ad", 1).apply();
+                mInterstitialAd = newInterstitialAd();
+                loadInterstitial();
+            } else {
+                preferences.edit().putInt("number_play_clicks_for_ad", numberPlays + 1).apply();
+            }
         }
     }
 
@@ -378,5 +397,44 @@ public class EpisodeActivity extends AppCompatActivity {
             playing = true;
         }
     };
+
+    //ad implementation
+    private InterstitialAd newInterstitialAd() {
+        InterstitialAd interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
+        interstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                showInterstitial();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+
+            }
+
+            @Override
+            public void onAdClosed() {
+
+            }
+        });
+        return interstitialAd;
+    }
+
+    private void showInterstitial() {
+        // Show the ad if it's ready. Otherwise toast and reload the ad.
+        if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Toast.makeText(this, "Ad did not load", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .setRequestAgent("android_studio:ad_template").build();
+        mInterstitialAd.loadAd(adRequest);
+    }
+
 
 }
