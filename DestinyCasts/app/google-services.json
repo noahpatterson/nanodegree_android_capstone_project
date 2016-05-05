@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "328066072530",
+    "project_id": "destinycasts"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328066072530:android:7ab21d2c180a62f0",
+        "android_client_info": {
+          "package_name": "me.noahpatterson.destinycasts"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyYdRYZLj8f0ikAN014kjpaiNCIs2ul84"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-69785705-2"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
