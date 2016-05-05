@@ -381,7 +381,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
         // Set the info for the views that show in the notification panel.
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)  // the status icon
+                .setSmallIcon(R.mipmap.destiny_logo)  // the status icon
 //                .setTicker(text)  // the status text
 //                .setWhen(System.currentTimeMillis())  // the time stamp
 //                .setLargeIcon(largePodcastIcon)
