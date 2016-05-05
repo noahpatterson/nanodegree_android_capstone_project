@@ -45,8 +45,17 @@
         <service
             android:name=".service.PlayerService"
             android:enabled="true"
-            android:exported="false" >
-        </service>
+            android:exported="false"></service>
+
+        <receiver android:name=".EpisodeWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/episode_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
