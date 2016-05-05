@@ -53,6 +53,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     private String episodeName;
     private String podcastTitle;
     private int podcastId;
+    private String previewURL;
 
     //player notification id
     private static int NOTIFICATION_ID = 101;
@@ -164,31 +165,32 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         }
 
         // moved normal implementation to the broadcast receivers because it seems easier to manipulate
-        String previewURL = intent.getStringExtra(EpisodeActivity.TRACK_PREVIEW_URL);
+        previewURL = intent.getStringExtra(EpisodeActivity.TRACK_PREVIEW_URL);
 
         //get player data
         episodeName = intent.getStringExtra(EPISODE_NAME);
         podcastTitle = intent.getStringExtra(PODCAST_TITLE);
         podcastId = intent.getIntExtra(PODCAST_ID, 0);
 
-        try {
-            mMediaPlayer.setDataSource(previewURL);
-        } catch(IllegalArgumentException e) {
-            Log.e("PlayTrackService start", "malformed url");
-        } catch (IOException e) {
-            Log.e("PlayTrackService start", "track may not exist");
-        }
 
-        mMediaPlayer.prepareAsync(); // prepare async to not block main thread
-        playingURL = previewURL;
-        seek = intent.getIntExtra(EpisodeActivity.SEEK_POSITION, 0);
         return 1;
     }
 
     private void playTrack(Intent intent, String previewURL) {
         // play request to start an existing track
         if (playingURL != null && playingURL.equals(previewURL)) {
+            playingURL = previewURL;
+            seek = intent.getIntExtra(EpisodeActivity.SEEK_POSITION, 0);
             mMediaPlayer.seekTo(intent.getIntExtra(EpisodeActivity.SEEK_POSITION, 0));
+//            try {
+//                mMediaPlayer.setDataSource(previewURL);
+//            } catch(IllegalArgumentException e) {
+//                Log.e("PlayTrackService start", "malformed url");
+//            } catch (IOException e) {
+//                Log.e("PlayTrackService start", "track may not exist");
+//            }
+
+//            mMediaPlayer.prepareAsync(); // prepare async to not block main thread
             notifyStart();
             mMediaPlayer.start();
         }
@@ -205,20 +207,22 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
             }
 
             mMediaPlayer.prepareAsync(); // prepare async to not block main thread
-            notifyStart();
+//            notifyStart();
 //            mMediaPlayer.start();
 
             playingURL = previewURL;
             seek = intent.getIntExtra(EpisodeActivity.SEEK_POSITION, 0);
         }
-        showNotification();
     }
 
     private BroadcastReceiver playTrackReciever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(LOG, "in playTrackReciever");
-            String previewURL = intent.getStringExtra(EpisodeActivity.TRACK_PREVIEW_URL);
+            previewURL = intent.getStringExtra(EpisodeActivity.TRACK_PREVIEW_URL);
+            episodeName = intent.getStringExtra(EpisodeActivity.EPISODE_NAME);
+            podcastTitle = intent.getStringExtra(EpisodeActivity.PODCAST_TITLE);
+            podcastId = intent.getIntExtra(EpisodeActivity.PODCAST_ID,0);
 
             playTrack(intent, previewURL);
         }
@@ -231,6 +235,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
             Log.d(LOG, "in pauseTrackReciever");
             mMediaPlayer.pause();
             updaterThread.interrupt();
+            showNotification();
         }
     };
 
@@ -255,6 +260,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         player.seekTo(seek);
         notifyStart();
         player.start();
+        showNotification();
 //        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 //            @Override
 //            public void onPrepared(MediaPlayer mp) {

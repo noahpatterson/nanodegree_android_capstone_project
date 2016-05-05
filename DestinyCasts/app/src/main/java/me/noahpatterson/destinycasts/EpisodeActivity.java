@@ -47,6 +47,9 @@ public class EpisodeActivity extends AppCompatActivity {
     public static final String ACTION_SEEK_TRACK = "me.noahpatterson.destinycasts.SEEK_TRACK";
     public static final String SEEK_POSITION = "seek_position";
     public static final String TRACK_PREVIEW_URL = "previewURL";
+    public static final String EPISODE_NAME = "episodeName";
+    public static final String PODCAST_TITLE = "podcastTitle";
+    public static final String PODCAST_ID = "podcastID";
 
     // onSaveInstantState constants
     public static final String PLAYING_URL = "playingURL";
@@ -314,6 +317,9 @@ public class EpisodeActivity extends AppCompatActivity {
             Intent intent = new Intent(ACTION_PLAY_TRACK);
             intent.putExtra(TRACK_PREVIEW_URL, episodeUrl);
             intent.putExtra(SEEK_POSITION, seek);
+            intent.putExtra(EPISODE_NAME, episodeName);
+            intent.putExtra(PODCAST_TITLE, podcastTitle);
+            intent.putExtra(PODCAST_ID, podcastID);
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
             playingURL = episodeUrl;
             playButton.setImageResource(android.R.drawable.ic_media_pause);
