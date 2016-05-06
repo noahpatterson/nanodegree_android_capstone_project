@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 
 import com.google.gson.Gson;
@@ -20,11 +22,14 @@ public class ChooseIntroActivity extends AppCompatActivity {
     private PodcastChooseArrayAdapter podcastAdapter;
     private SharedPreferences preferences;
     private List<Podcast> favoritePodcasts;
+    private Button continueButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_intro);
+
+        continueButton = (Button) findViewById(R.id.continueButton);
 
         // Get the shared preferences
         preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
@@ -32,6 +37,24 @@ public class ChooseIntroActivity extends AppCompatActivity {
         List<Podcast> podcastList = Utilities.getPodcastsFavorites(this, preferences);
 
         podcastGridView = (GridView) findViewById(R.id.podcastGridView);
+        podcastGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    int count = podcastGridView.getChildCount();
+                    boolean aPodcastIsSelected = false;
+                    for(int i = 0;i  < count;i++) {
+                        if (podcastAdapter.getItem(i).isSelected) {
+                            aPodcastIsSelected = true;
+                            return;
+                        }
+                    }
+                    if (aPodcastIsSelected) {
+                        enableContinueButton();
+                    } else {
+                        disableContinueButton();
+                    }
+                }
+        });
 
         //if saved favorites, load them, else create a new list
 //        List<Podcast> favoritePodcasts;
@@ -43,6 +66,7 @@ public class ChooseIntroActivity extends AppCompatActivity {
         podcastAdapter = new PodcastChooseArrayAdapter(this, favoritePodcasts);
         podcastGridView.setAdapter(podcastAdapter);
     }
+
 
     public void finishOnboarding(View view) {
         // Set onboarding_complete to true
@@ -66,6 +90,7 @@ public class ChooseIntroActivity extends AppCompatActivity {
             podcastAdapter.getItem(i).isSelected = true;
         }
         podcastAdapter.notifyDataSetChanged();
+        enableContinueButton();
     }
 
     @Override
@@ -93,4 +118,15 @@ public class ChooseIntroActivity extends AppCompatActivity {
         preferences.edit()
                 .putString("podcast favorites",jsonText).apply();
     }
+
+    private void enableContinueButton() {
+        continueButton.setAlpha(1f);
+        continueButton.setClickable(true);
+    }
+
+    private void disableContinueButton() {
+        continueButton.setAlpha(0.5f);
+        continueButton.setClickable(false);
+    }
+
 }

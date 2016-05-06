@@ -4,7 +4,9 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,7 +33,7 @@ public class PodcastChooseArrayAdapter extends ArrayAdapter<Podcast> {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         final Podcast podcast = getItem(position);
 
         if (convertView == null) {
@@ -47,6 +49,7 @@ public class PodcastChooseArrayAdapter extends ArrayAdapter<Podcast> {
             @Override
             public void onClick(View v) {
                 Utilities.togglePodcastSelected(v, podcast);
+                ((AdapterView) parent).performItemClick(v, position, 0);
             }
         });
 
