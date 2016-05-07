@@ -187,15 +187,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
             playingURL = previewURL;
             seek = intent.getIntExtra(EpisodeActivity.SEEK_POSITION, 0);
             mMediaPlayer.seekTo(intent.getIntExtra(EpisodeActivity.SEEK_POSITION, 0));
-//            try {
-//                mMediaPlayer.setDataSource(previewURL);
-//            } catch(IllegalArgumentException e) {
-//                Log.e("PlayTrackService start", "malformed url");
-//            } catch (IOException e) {
-//                Log.e("PlayTrackService start", "track may not exist");
-//            }
 
-//            mMediaPlayer.prepareAsync(); // prepare async to not block main thread
             notifyStart();
             mMediaPlayer.start();
         }
@@ -212,8 +204,6 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
             }
 
             mMediaPlayer.prepareAsync(); // prepare async to not block main thread
-//            notifyStart();
-//            mMediaPlayer.start();
 
             playingURL = previewURL;
             seek = intent.getIntExtra(EpisodeActivity.SEEK_POSITION, 0);
@@ -268,12 +258,6 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         player.start();
         showNotification();
         sendWidgetUpdate();
-//        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//            @Override
-//            public void onPrepared(MediaPlayer mp) {
-//                mMediaPlayer.start();
-//            }
-//        });
     }
 
     @Override
@@ -316,19 +300,13 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         stopForeground(true);
     }
 
-//    public int getTotalTrackTime() {
-//        if (mMediaPlayer != null) {
-//            return mMediaPlayer.getDuration();
-//        }
-//        return 0;
-//    }
-
     private void showNotification() {
         Bitmap largePodcastIcon = BitmapFactory.decodeResource(getResources(),
                 Utilities.findPodcastImage(podcastTitle));
         //setup custom notification layout
         RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.player_notification);
         remoteViews.setImageViewBitmap(R.id.episodeNotficationImageView,largePodcastIcon);
+        remoteViews.setContentDescription(R.id.episodeNotficationImageView, podcastTitle +  getString(R.string.content_desc_logo));
         remoteViews.setTextViewText(R.id.notificationEpisodeName, episodeName);
         remoteViews.setTextViewText(R.id.notificationPodcastName, podcastTitle);
 
@@ -389,11 +367,6 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         // Set the info for the views that show in the notification panel.
         Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.mipmap.destiny_logo)  // the status icon
-//                .setTicker(text)  // the status text
-//                .setWhen(System.currentTimeMillis())  // the time stamp
-//                .setLargeIcon(largePodcastIcon)
-//                .setContentTitle(episodeName)  // the label of the entry
-//                .setContentText(podcastTitle)  // the contents of the entry
                 .setContentIntent(resultPendingIntent)  // The intent to send when the entry is clicked
                 .setContent(remoteViews)
                 .build();
@@ -411,6 +384,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         //setup custom notification layout
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.episode_widget);
         remoteViews.setImageViewBitmap(R.id.episodeNotficationImageView, largePodcastIcon);
+        remoteViews.setContentDescription(R.id.episodeNotficationImageView, podcastTitle +  getString(R.string.content_desc_logo));
         remoteViews.setTextViewText(R.id.notificationEpisodeName, episodeName);
         remoteViews.setTextViewText(R.id.notificationPodcastName, podcastTitle);
 

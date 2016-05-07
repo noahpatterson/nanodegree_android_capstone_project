@@ -41,6 +41,7 @@ public class PodcastChooseArrayAdapter extends ArrayAdapter<Podcast> {
         }
 
         ImageView podcastImageView = (ImageView) convertView.findViewById(R.id.podcastImageView);
+        podcastImageView.setContentDescription(podcast.name + mContext.getString(R.string.content_desc_logo));
         Glide.with(mContext).load(podcast.photo).into(podcastImageView);
 
         Utilities.setImageSelected(convertView, podcast);

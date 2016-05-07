@@ -126,6 +126,7 @@ public class EpisodeActivity extends AppCompatActivity {
 
                 ImageView episodeImageView = (ImageView) findViewById(R.id.episodeDetailImageView);
                 Glide.with(context).load(imageUrl.equals("") ? Utilities.findPodcastImage(podcastTitle) : imageUrl).into(episodeImageView);
+                episodeImageView.setContentDescription(podcastTitle + getString(R.string.content_desc_logo));
 
                 //title
                 int episodeIndex = c.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_TITLE);

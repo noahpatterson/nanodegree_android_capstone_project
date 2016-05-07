@@ -100,6 +100,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
 
         Log.i(LOG_TAG, "Image reference extracted: " + imageUrl);
         Glide.with(mContext).load(imageUrl.equals("") ? Utilities.findPodcastImage(podcastTitle) : imageUrl).into(viewHolder.episodeImageView);
+        viewHolder.episodeImageView.setContentDescription(podcastTitle + mContext.getString(R.string.content_desc_logo));
 
         //date
         int episodeDateIndex = mCursor.getColumnIndex(PodcastContract.EpisodeEntry.COLUMN_PUB_DATE);
