@@ -30,13 +30,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import java.util.Arrays;
 import java.util.List;
 
 import me.noahpatterson.destinycasts.data.PodcastContract;
 import me.noahpatterson.destinycasts.model.Podcast;
-import me.noahpatterson.destinycasts.service.PlayerService;
 
 public class WeeklyListActivity extends AppCompatActivity {
 
@@ -50,9 +52,9 @@ public class WeeklyListActivity extends AppCompatActivity {
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private EpisodeAdapter mEpisodeAdapters;
     private static List<Podcast> podcastList;
     private static List<Podcast> favPodcastList;
+    private static Tracker mTracker;
     private static final String LOG_TAG = "weeklyList";
 
     private static long ONE_DAY_IN_MILLI = 86400000;
@@ -69,17 +71,23 @@ public class WeeklyListActivity extends AppCompatActivity {
         super.onStart();
         registerReceiver(mRefreshingReceiver,
                 new IntentFilter(FetchPodcastFeedsIntentService.BROADCAST_ACTION_STATE_CHANGE));
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         unregisterReceiver(mRefreshingReceiver);
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //set analytics tracker
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         //call the Rss lookup as fast as possible
         //get all podcast list
@@ -129,6 +137,36 @@ public class WeeklyListActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.d(LOG_TAG, "in onPageChanged");
+                String name;
+                switch (position) {
+                    case 0:
+                        name = "This Week";
+                        break;
+                    case 1:
+                        name = "Last Week";
+                        break;
+                    default:
+                        name = "No name";
+                }
+                Log.d(LOG_TAG, "Setting screen name: " + name);
+                mTracker.setScreenName(name + " Tab");
+                mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -160,6 +198,10 @@ public class WeeklyListActivity extends AppCompatActivity {
         // Start the onboarding Activity
         Intent onboarding = new Intent(this, ChooseIntroActivity.class);
         startActivity(onboarding);
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Action")
+                .setAction("Starting on boarding")
+                .build());
 
         // Close the main Activity
         finish();
@@ -205,6 +247,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         private EpisodeAdapter mEpisodeAdapters;
         private RecyclerView mRecyclerView;
         private static final String LOG_TAG = "EpisodeFragment";
+        private int cursorLoaderId;
         public EpisodeFragment() {
         }
 
@@ -222,7 +265,7 @@ public class WeeklyListActivity extends AppCompatActivity {
 
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
-            int cursorLoaderId = this.getArguments().getInt(ARG_WEEK_NUMBER);
+            cursorLoaderId = this.getArguments().getInt(ARG_WEEK_NUMBER);
             getLoaderManager().initLoader(cursorLoaderId,null, this);
             super.onCreate(savedInstanceState);
         }
@@ -236,7 +279,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             Log.d("weeklyList", "in onCreateView");
-            int cursorLoaderId = this.getArguments().getInt(ARG_WEEK_NUMBER);
+//            int cursorLoaderId = this.getArguments().getInt(ARG_WEEK_NUMBER);
             mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId, new EpisodeAdapter.EpisodeAdapterOnClickHandler() {
                 @Override
                 public void onClick(int podcastId, EpisodeAdapter.ViewHolder vh) {
@@ -254,9 +297,16 @@ public class WeeklyListActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onResume() {
+            super.onResume();
+            Log.d(LOG_TAG, "in onResume");
+        }
+
+        @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             Log.d("weeklyList", "in onCreateLoader");
-            int weekPageNumber = this.getArguments().getInt(ARG_WEEK_NUMBER);
+            int weekPageNumber = cursorLoaderId;
+//            int weekPageNumber = this.getArguments().getInt(ARG_WEEK_NUMBER);
             StringBuilder sb = new StringBuilder();
             if (favPodcastList != null) {
                 for (int i = 0; i < favPodcastList.size(); i++) {
@@ -270,8 +320,6 @@ public class WeeklyListActivity extends AppCompatActivity {
 
             //get the database
             String favoritePodcastSelection = " AND " + PodcastContract.EpisodeEntry.COLUMN_PODCAST_TITLE + " IN ("+ sb.toString() + ")";
-//            Log.d("weeklyList", sb.toString());
-//            Log.d("weeklyList", favoritePodcastSelection);
             switch (weekPageNumber) {
                 case 0:
 //                    return "This Week";

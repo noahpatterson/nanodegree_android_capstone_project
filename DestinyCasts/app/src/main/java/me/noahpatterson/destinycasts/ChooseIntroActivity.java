@@ -9,6 +9,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 
 import java.util.Arrays;
@@ -23,6 +25,7 @@ public class ChooseIntroActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     private List<Podcast> favoritePodcasts;
     private Button continueButton;
+    private Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,10 @@ public class ChooseIntroActivity extends AppCompatActivity {
         }
         podcastAdapter = new PodcastChooseArrayAdapter(this, favoritePodcasts);
         podcastGridView.setAdapter(podcastAdapter);
+
+        //set analytics tracker
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
     }
 
 
@@ -101,8 +108,16 @@ public class ChooseIntroActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        storeSelectedPodcasts();
         super.onStop();
+        storeSelectedPodcasts();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
     @Override

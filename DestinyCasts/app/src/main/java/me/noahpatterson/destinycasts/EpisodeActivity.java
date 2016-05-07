@@ -26,6 +26,8 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -71,6 +73,7 @@ public class EpisodeActivity extends AppCompatActivity {
     private SeekBar seekBar;
     private TextView trackTimeTextView;
     private InterstitialAd mInterstitialAd;
+    private Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,11 +243,16 @@ public class EpisodeActivity extends AppCompatActivity {
                 Log.d(LOG, "onStopTrackingTouch");
             }
         });
+
+        //set analytics tracker
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
     }
 
     @Override
     public void onStart() {
         Log.d(LOG, "in onStart");
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
         super.onStart();
 
     }
@@ -292,6 +300,7 @@ public class EpisodeActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         Log.d(LOG, "in onStop");
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
         super.onStop();
     }
 
