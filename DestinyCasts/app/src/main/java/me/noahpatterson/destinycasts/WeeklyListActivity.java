@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -65,6 +66,8 @@ public class WeeklyListActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     private boolean mIsRefreshing = false;
+    private EpisodeFragment thisWeekFragment;
+    private EpisodeFragment lastWeekFragment;
 
     @Override
     protected void onStart() {
@@ -85,16 +88,16 @@ public class WeeklyListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //set analytics tracker
-        AnalyticsApplication application = (AnalyticsApplication) getApplication();
-        mTracker = application.getDefaultTracker();
-
         //call the Rss lookup as fast as possible
         //get all podcast list
         podcastList = Arrays.asList(Utilities.podcastsList);
 
         // Get the shared preferences
         SharedPreferences preferences =  getSharedPreferences("my_preferences", MODE_PRIVATE);
+
+        //set analytics tracker
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         // Check if onboarding_complete is false
         if(!preferences.getBoolean("onboarding_complete",false)) {
@@ -111,6 +114,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         }
 
         //get podcast favorites
+
         favPodcastList = Utilities.getPodcastsFavorites(this, preferences);
 
         setContentView(R.layout.activity_weekly_list);
@@ -190,6 +194,12 @@ public class WeeklyListActivity extends AppCompatActivity {
             if (FetchPodcastFeedsIntentService.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
                 mIsRefreshing = intent.getBooleanExtra(FetchPodcastFeedsIntentService.EXTRA_REFRESHING, false);
                 updateRefreshingUI();
+                if (!mIsRefreshing && thisWeekFragment != null && lastWeekFragment != null) {
+                    Log.d(LOG_TAG, "data has refreshed - in !mIsRefreshing");
+                    thisWeekFragment.notifyDataIsRefreshed();
+                    lastWeekFragment.notifyDataIsRefreshed();
+                    mViewPager.invalidate();
+                }
             }
         }
     };
@@ -206,6 +216,12 @@ public class WeeklyListActivity extends AppCompatActivity {
         // Close the main Activity
         finish();
     }
+
+    private String getFragmentTag(int viewPagerId, int fragmentPosition)
+    {
+        return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
+    }
+
 
     private void refreshPodcasts(){
         FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
@@ -234,10 +250,6 @@ public class WeeklyListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
     public static class EpisodeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
         /**
          * The fragment argument representing the section number for this
@@ -263,6 +275,11 @@ public class WeeklyListActivity extends AppCompatActivity {
             return fragment;
         }
 
+        public void notifyDataIsRefreshed() {
+            Log.d(LOG_TAG, "in notifyDataIsRefreshed");
+            getLoaderManager().restartLoader(cursorLoaderId,null,this);
+        }
+
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             cursorLoaderId = this.getArguments().getInt(ARG_WEEK_NUMBER);
@@ -279,7 +296,6 @@ public class WeeklyListActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             Log.d("weeklyList", "in onCreateView");
-//            int cursorLoaderId = this.getArguments().getInt(ARG_WEEK_NUMBER);
             mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId, new EpisodeAdapter.EpisodeAdapterOnClickHandler() {
                 @Override
                 public void onClick(int podcastId, EpisodeAdapter.ViewHolder vh) {
@@ -306,7 +322,6 @@ public class WeeklyListActivity extends AppCompatActivity {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             Log.d("weeklyList", "in onCreateLoader");
             int weekPageNumber = cursorLoaderId;
-//            int weekPageNumber = this.getArguments().getInt(ARG_WEEK_NUMBER);
             StringBuilder sb = new StringBuilder();
             if (favPodcastList != null) {
                 for (int i = 0; i < favPodcastList.size(); i++) {
@@ -362,6 +377,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             Log.d(LOG_TAG, "in onLoadFinished");
             mEpisodeAdapters.swapCursor(data);
+            mEpisodeAdapters.notifyDataSetChanged();
         }
 
         @Override
@@ -403,6 +419,21 @@ public class WeeklyListActivity extends AppCompatActivity {
                     return "Last Week";
             }
             return null;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
+            // save the appropriate reference depending on position
+            switch (position) {
+                case 0:
+                    thisWeekFragment = (EpisodeFragment) createdFragment;
+                    break;
+                case 1:
+                    lastWeekFragment = (EpisodeFragment) createdFragment;
+                    break;
+            }
+            return createdFragment;
         }
     }
 
