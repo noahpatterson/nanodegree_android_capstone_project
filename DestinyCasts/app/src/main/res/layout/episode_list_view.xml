@@ -5,7 +5,9 @@
         android:id="@+id/episodeContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@drawable/episode_touch_selector"
+        >
 
         <ImageView
             android:id="@+id/episodeImageView"

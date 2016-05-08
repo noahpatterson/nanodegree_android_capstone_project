@@ -70,6 +70,7 @@ public class WeeklyListActivity extends AppCompatActivity {
     private EpisodeFragment lastWeekFragment;
     private static boolean mTwoPane = false;
     private static int lastItemSelected;
+    private static int lastItemPosition;
 
     @Override
     protected void onStart() {
@@ -219,7 +220,7 @@ public class WeeklyListActivity extends AppCompatActivity {
                 refreshPodcasts();
             }
         });
-         
+
         if (mTwoPane && savedInstanceState != null) {
             lastItemSelected = savedInstanceState.getInt("episode_id");
             Bundle args = new Bundle();
@@ -339,10 +340,17 @@ public class WeeklyListActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             Log.d("weeklyList", "in onCreateView");
 
+
             mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId, new EpisodeAdapter.EpisodeAdapterOnClickHandler() {
                 @Override
-                public void onClick(int podcastId, EpisodeAdapter.ViewHolder vh) {
+                public void onClick(int podcastId, int position, EpisodeAdapter.ViewHolder vh) {
+                    //clear last selected
+//                    View lastSelected = mRecyclerView.getLayoutManager().findViewByPosition(lastItemPosition);
+//                    lastSelected.setActivated(false);
+                    lastItemPosition = position;
                     lastItemSelected = podcastId;
+//                    vh.itemView.setActivated(true);
+                    mEpisodeAdapters.notifyItemChanged(position);
                     if (mTwoPane) {
                         Bundle args = new Bundle();
                         args.putInt("podcast_id", podcastId);

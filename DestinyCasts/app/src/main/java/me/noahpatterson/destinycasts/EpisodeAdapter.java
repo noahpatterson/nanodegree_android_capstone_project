@@ -59,12 +59,12 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
             mCursor.moveToPosition(adapterPosition);
             int podcastIdIndex = mCursor.getColumnIndex(PodcastContract.EpisodeEntry._ID);
             int podcastId = mCursor.getInt(podcastIdIndex);
-            eClickHandler.onClick(podcastId,this);
+            eClickHandler.onClick(podcastId, adapterPosition, this);
         }
     }
 
     public static interface EpisodeAdapterOnClickHandler {
-        void onClick(int podcastId, ViewHolder vh);
+        void onClick(int podcastId, int position, ViewHolder vh);
     }
 
     @Override
@@ -125,5 +125,9 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     public void swapCursor(Cursor newCursor) {
         mCursor = newCursor;
         notifyDataSetChanged();
+    }
+
+    public ViewHolder getItem(int itemId) {
+        return this.getItem(itemId);
     }
 }
