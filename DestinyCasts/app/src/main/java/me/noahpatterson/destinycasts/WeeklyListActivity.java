@@ -69,6 +69,7 @@ public class WeeklyListActivity extends AppCompatActivity {
     private EpisodeFragment thisWeekFragment;
     private EpisodeFragment lastWeekFragment;
     private static boolean mTwoPane = false;
+    private static int lastItemSelected;
 
     @Override
     protected void onStart() {
@@ -83,6 +84,29 @@ public class WeeklyListActivity extends AppCompatActivity {
         super.onStop();
         unregisterReceiver(mRefreshingReceiver);
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "in onDestory");
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("episode_id", lastItemSelected);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -195,6 +219,17 @@ public class WeeklyListActivity extends AppCompatActivity {
                 refreshPodcasts();
             }
         });
+         
+        if (mTwoPane && savedInstanceState != null) {
+            lastItemSelected = savedInstanceState.getInt("episode_id");
+            Bundle args = new Bundle();
+            args.putInt("podcast_id", lastItemSelected);
+            EpisodeDetailFragment episodeDetailFragment = new EpisodeDetailFragment();
+            episodeDetailFragment.setArguments(args);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.player_detail_container, episodeDetailFragment)
+                    .commit();
+        }
     }
 
     //handle refresh action
@@ -307,6 +342,7 @@ public class WeeklyListActivity extends AppCompatActivity {
             mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId, new EpisodeAdapter.EpisodeAdapterOnClickHandler() {
                 @Override
                 public void onClick(int podcastId, EpisodeAdapter.ViewHolder vh) {
+                    lastItemSelected = podcastId;
                     if (mTwoPane) {
                         Bundle args = new Bundle();
                         args.putInt("podcast_id", podcastId);
@@ -327,6 +363,7 @@ public class WeeklyListActivity extends AppCompatActivity {
             mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_episodes);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             mRecyclerView.setAdapter(mEpisodeAdapters);
+
             return rootView;
         }
 
@@ -455,22 +492,5 @@ public class WeeklyListActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        Log.d(LOG_TAG, "in onDestory");
-        super.onDestroy();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //is this master detail layout?
-//        if (findViewById(R.id.player_detail_container) != null) {
-//            // The detail container view will be present only in the
-//            // large-screen layouts (res/values-w600dp).
-//            // If this view is present, then the
-//            // activity should be in two-pane mode.
-//            mTwoPane = true;
-//        }
-    }
 }

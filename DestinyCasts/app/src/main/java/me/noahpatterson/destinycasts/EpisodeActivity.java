@@ -99,7 +99,6 @@ public class EpisodeActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             Bundle args = new Bundle();
             args.putInt("podcast_id", podcastID);
-//            EpisodeDetailFragment episodeDetailFragment = new EpisodeDetailFragment();
             EpisodeDetailFragment episodeDetailFragment = new EpisodeDetailFragment();
             episodeDetailFragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
