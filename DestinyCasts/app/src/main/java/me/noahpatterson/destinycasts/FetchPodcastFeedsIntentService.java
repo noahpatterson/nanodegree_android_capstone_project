@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.einmalfel.earl.EarlParser;
-import com.einmalfel.earl.Enclosure;
 import com.einmalfel.earl.Feed;
 import com.einmalfel.earl.Item;
 import com.einmalfel.earl.MediaItem;
@@ -21,7 +20,6 @@ import com.einmalfel.earl.RSSItem;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +45,6 @@ public class FetchPodcastFeedsIntentService extends IntentService {
 
     private static final String LOG_TAG = "FeedsIntentService";
     private static Context mContext;
-    private static long ONE_DAY_IN_MILLI = 86400000;
 
     public FetchPodcastFeedsIntentService() {
         super("FetchPodcastFeedsIntentService");
@@ -134,7 +131,7 @@ public class FetchPodcastFeedsIntentService extends IntentService {
             Item episode = ((Item) episodeList.get(i));
             RSSItem episodeRssItem = ((RSSItem) episode);
             String title = episode.getTitle();
-            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_TITLE, (title == null ? "N/A" : title));
+            episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_TITLE, (title == null ? getString(R.string.not_available) : title));
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_DESCRIPTION, episode.getDescription());
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_IMAGE_URL, (episodeRssItem.itunes.image == null ? "" : episodeRssItem.itunes.image.toString()));
             episodeValuesArr[i].put(PodcastContract.EpisodeEntry.COLUMN_PUB_DATE, episode.getPublicationDate().getTime());
@@ -150,6 +147,7 @@ public class FetchPodcastFeedsIntentService extends IntentService {
 
         // delete old data so we don't build up an endless history
 //        TODO: we are deleting old episodes older than 7 days, but should keep all this weeks episodes
+        long ONE_DAY_IN_MILLI = 86400000;
         mContext.getContentResolver().delete(PodcastContract.EpisodeEntry.CONTENT_URI,
                 PodcastContract.EpisodeEntry.COLUMN_PUB_DATE + " < ?",
                 new String[] {Long.toString(System.currentTimeMillis() - (ONE_DAY_IN_MILLI * 14))});
@@ -166,9 +164,10 @@ public class FetchPodcastFeedsIntentService extends IntentService {
                 new String[]{title},
                 null);
 
-        if (podcastCursor.moveToFirst()) {
+        if (podcastCursor != null && podcastCursor.moveToFirst()) {
             int podcastIdIndex = podcastCursor.getColumnIndex(PodcastContract.PodcastEntry._ID);
             podcastId = podcastCursor.getLong(podcastIdIndex);
+            podcastCursor.close();
         } else {
             // Now that the content provider is set up, inserting rows of data is pretty simple.
             // First create a ContentValues object to hold the data you want to insert.
@@ -191,7 +190,6 @@ public class FetchPodcastFeedsIntentService extends IntentService {
             podcastId = ContentUris.parseId(insertedUri);
         }
 
-        podcastCursor.close();
         return podcastId;
     }
 
@@ -207,11 +205,12 @@ public class FetchPodcastFeedsIntentService extends IntentService {
         if (!enclosuresList.isEmpty()) {
             enclosure = enclosuresList.get(0).url;
         }
-        if (link != null && link.endsWith(".mp3")) {
+        String mp3 = getString(R.string.mp3_extension);
+        if (link != null && link.endsWith(mp3)) {
             return link;
-        } else if ( mediaContents != null && mediaContents.toString().endsWith(".mp3")) {
+        } else if ( mediaContents != null && mediaContents.toString().endsWith(mp3)) {
             return mediaContents.toString();
-        } else if (enclosure != null && enclosure.toString().endsWith(".mp3")) {
+        } else if (enclosure != null && enclosure.toString().endsWith(mp3)) {
             return enclosure.toString();
         }
         Log.e(LOG_TAG, "cannot find episode url");

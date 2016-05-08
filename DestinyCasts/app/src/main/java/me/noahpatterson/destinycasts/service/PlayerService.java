@@ -1,7 +1,6 @@
 package me.noahpatterson.destinycasts.service;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
@@ -21,8 +20,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.bumptech.glide.Glide;
-
 import java.io.IOException;
 import java.util.Random;
 
@@ -30,7 +27,6 @@ import me.noahpatterson.destinycasts.EpisodeActivity;
 import me.noahpatterson.destinycasts.EpisodeWidget;
 import me.noahpatterson.destinycasts.R;
 import me.noahpatterson.destinycasts.Utilities;
-import me.noahpatterson.destinycasts.WeeklyListActivity;
 
 public class PlayerService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
     public static final String ACTION_CURR_POSITION = "me.noahpatterson.destinycasts.CURR_POSITION";
@@ -262,7 +258,6 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
-        Log.e("PlayTrackService start", "Error: " + what + ", " + extra);
         return true;
     }
     @Override

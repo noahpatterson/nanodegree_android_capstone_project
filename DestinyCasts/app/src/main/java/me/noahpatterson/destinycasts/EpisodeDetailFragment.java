@@ -77,7 +77,6 @@ public class EpisodeDetailFragment extends Fragment {
     private SeekBar seekBar;
     private TextView trackTimeTextView;
     private InterstitialAd mInterstitialAd;
-    private Tracker mTracker;
 
     public EpisodeDetailFragment() {
 
@@ -87,24 +86,10 @@ public class EpisodeDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_episode);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         context = getContext();
         activity = getActivity();
 
-//        podcastID = getIntent().getIntExtra("podcast_id", 0);
         podcastID = getArguments().getInt("podcast_id");
 
 
@@ -139,7 +124,7 @@ public class EpisodeDetailFragment extends Fragment {
 
         //set analytics tracker
         AnalyticsApplication application = (AnalyticsApplication) activity.getApplication();
-        mTracker = application.getDefaultTracker();
+        Tracker mTracker = application.getDefaultTracker();
     }
 
     @Override
@@ -277,7 +262,6 @@ public class EpisodeDetailFragment extends Fragment {
         Log.d(LOG, "in onStart");
         GoogleAnalytics.getInstance(activity).reportActivityStart(activity);
         super.onStart();
-
     }
 
     @Override
@@ -335,9 +319,6 @@ public class EpisodeDetailFragment extends Fragment {
 
     public void playTrack() {
         Log.d(LOG, "in playTrack");
-
-
-
         // if playing and the current selected track's URL matches the PlayingURL we pause the track
         if (playing && episodeUrl.equals(playingURL)) {
 
@@ -442,12 +423,10 @@ public class EpisodeDetailFragment extends Fragment {
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
-
             }
 
             @Override
             public void onAdClosed() {
-
             }
         });
         return interstitialAd;

@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,10 +25,6 @@ public class PodcastChooseArrayAdapter extends ArrayAdapter<Podcast> {
         super(context, 0, podcastList);
         mContext = context;
         this.podcastList = podcastList;
-    }
-
-    public List<Podcast> getAllItems() {
-        return podcastList;
     }
 
     @Override

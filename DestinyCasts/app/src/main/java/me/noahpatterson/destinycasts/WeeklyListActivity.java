@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -70,7 +69,6 @@ public class WeeklyListActivity extends AppCompatActivity {
     private EpisodeFragment lastWeekFragment;
     private static boolean mTwoPane = false;
     private static int lastItemSelected;
-//    private static int lastItemPosition;
     private static int selectedWeek;
 
     @Override
@@ -146,7 +144,6 @@ public class WeeklyListActivity extends AppCompatActivity {
         }
 
         //get podcast favorites
-
         favPodcastList = Utilities.getPodcastsFavorites(this, preferences);
 
         setContentView(R.layout.activity_weekly_list);
@@ -206,16 +203,16 @@ public class WeeklyListActivity extends AppCompatActivity {
                 String name;
                 switch (position) {
                     case 0:
-                        name = "This Week";
+                        name = getString(R.string.this_week);
                         break;
                     case 1:
-                        name = "Last Week";
+                        name = getString(R.string.last_week);
                         break;
                     default:
-                        name = "No name";
+                        name = getString(R.string.analytics_no_page);
                 }
                 Log.d(LOG_TAG, "Setting screen name: " + name);
-                mTracker.setScreenName(name + " Tab");
+                mTracker.setScreenName(name + getString(R.string.analytics_screen_name_suffix));
                 mTracker.send(new HitBuilders.ScreenViewBuilder().build());
             }
 
@@ -359,12 +356,7 @@ public class WeeklyListActivity extends AppCompatActivity {
             mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId, new EpisodeAdapter.EpisodeAdapterOnClickHandler() {
                 @Override
                 public void onClick(int podcastId, int position, EpisodeAdapter.ViewHolder vh) {
-                    //clear last selected
-//                    View lastSelected = mRecyclerView.getLayoutManager().findViewByPosition(lastItemPosition);
-//                    lastSelected.setActivated(false);
-//                    lastItemPosition = position;
                     lastItemSelected = podcastId;
-//                    vh.itemView.setActivated(true);
                     mEpisodeAdapters.notifyItemChanged(position);
                     if (mTwoPane) {
                         Bundle args = new Bundle();
@@ -493,10 +485,10 @@ public class WeeklyListActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     selectedWeek = 0;
-                    return "This Week";
+                    return getString(R.string.this_week);
                 case 1:
                     selectedWeek = 1;
-                    return "Last Week";
+                    return getString(R.string.last_week);
             }
             return null;
         }

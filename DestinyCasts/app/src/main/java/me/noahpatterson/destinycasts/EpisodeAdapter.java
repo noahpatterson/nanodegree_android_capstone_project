@@ -26,14 +26,12 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
 
     private static final String LOG_TAG = EpisodeAdapter.class.getSimpleName();
     private Context mContext;
-    private static int sLoaderID;
     private Cursor mCursor;
     private EpisodeAdapterOnClickHandler eClickHandler;
 
     public EpisodeAdapter(Context context, Cursor c, int flags, int loaderID, EpisodeAdapterOnClickHandler episodeAdapterOnClickHandler){
         Log.d(LOG_TAG, "EpisodeAdapter");
         mContext = context;
-        sLoaderID = loaderID;
         mCursor = c;
         eClickHandler = episodeAdapterOnClickHandler;
     }
@@ -63,7 +61,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         }
     }
 
-    public static interface EpisodeAdapterOnClickHandler {
+    public interface EpisodeAdapterOnClickHandler {
         void onClick(int podcastId, int position, ViewHolder vh);
     }
 
@@ -125,9 +123,5 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     public void swapCursor(Cursor newCursor) {
         mCursor = newCursor;
         notifyDataSetChanged();
-    }
-
-    public ViewHolder getItem(int itemId) {
-        return this.getItem(itemId);
     }
 }

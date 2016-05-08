@@ -68,10 +68,5 @@ public class PodcastContract {
         public static Uri buildEpisodeUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-        //for all podcasts
-//        public static Uri buildAllEpisodesUri(){
-//            return
-//        }
     }
 }
