@@ -68,6 +68,7 @@ public class WeeklyListActivity extends AppCompatActivity {
     private boolean mIsRefreshing = false;
     private EpisodeFragment thisWeekFragment;
     private EpisodeFragment lastWeekFragment;
+    private static boolean mTwoPane = false;
 
     @Override
     protected void onStart() {
@@ -133,6 +134,15 @@ public class WeeklyListActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //is this master detail layout?
+        if (findViewById(R.id.player_detail_container) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-w600dp).
+            // If this view is present, then the
+            // activity should be in two-pane mode.
+            mTwoPane = true;
+        }
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -217,12 +227,6 @@ public class WeeklyListActivity extends AppCompatActivity {
         finish();
     }
 
-    private String getFragmentTag(int viewPagerId, int fragmentPosition)
-    {
-        return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
-    }
-
-
     private void refreshPodcasts(){
         FetchPodcastFeedsIntentService.startActionFetchNew(this,podcastList);
     }
@@ -299,9 +303,19 @@ public class WeeklyListActivity extends AppCompatActivity {
             mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId, new EpisodeAdapter.EpisodeAdapterOnClickHandler() {
                 @Override
                 public void onClick(int podcastId, EpisodeAdapter.ViewHolder vh) {
-                    Intent intent = new Intent(getActivity(), EpisodeActivity.class);
-                    intent.putExtra("podcast_id", podcastId);
-                    startActivity(intent);
+                    if (mTwoPane) {
+                        Bundle args = new Bundle();
+                        args.putInt("podcast_id", podcastId);
+                        EpisodeDetailFragment episodeDetailFragment = new EpisodeDetailFragment();
+                        episodeDetailFragment.setArguments(args);
+                        getFragmentManager().beginTransaction()
+                                .replace(R.id.player_detail_container, episodeDetailFragment)
+                                .commit();
+                    } else {
+                        Intent intent = new Intent(getActivity(), EpisodeActivity.class);
+                        intent.putExtra("podcast_id", podcastId);
+                        startActivity(intent);
+                    }
                 }
             });
 
