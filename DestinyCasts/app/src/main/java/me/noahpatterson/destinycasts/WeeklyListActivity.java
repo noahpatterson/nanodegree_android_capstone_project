@@ -87,6 +87,7 @@ public class WeeklyListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "in onCreate");
         super.onCreate(savedInstanceState);
 
         //call the Rss lookup as fast as possible
@@ -132,9 +133,6 @@ public class WeeklyListActivity extends AppCompatActivity {
 
         ///////////////
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         //is this master detail layout?
         if (findViewById(R.id.player_detail_container) != null) {
             // The detail container view will be present only in the
@@ -142,7 +140,12 @@ public class WeeklyListActivity extends AppCompatActivity {
             // If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
+        } else {
+            mTwoPane = false;
         }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -300,6 +303,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             Log.d("weeklyList", "in onCreateView");
+
             mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId, new EpisodeAdapter.EpisodeAdapterOnClickHandler() {
                 @Override
                 public void onClick(int podcastId, EpisodeAdapter.ViewHolder vh) {
@@ -455,5 +459,18 @@ public class WeeklyListActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.d(LOG_TAG, "in onDestory");
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //is this master detail layout?
+//        if (findViewById(R.id.player_detail_container) != null) {
+//            // The detail container view will be present only in the
+//            // large-screen layouts (res/values-w600dp).
+//            // If this view is present, then the
+//            // activity should be in two-pane mode.
+//            mTwoPane = true;
+//        }
     }
 }
