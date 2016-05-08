@@ -70,7 +70,8 @@ public class WeeklyListActivity extends AppCompatActivity {
     private EpisodeFragment lastWeekFragment;
     private static boolean mTwoPane = false;
     private static int lastItemSelected;
-    private static int lastItemPosition;
+//    private static int lastItemPosition;
+    private static int selectedWeek;
 
     @Override
     protected void onStart() {
@@ -90,6 +91,8 @@ public class WeeklyListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Log.d(LOG_TAG, "in onDestory");
+        SharedPreferences preferences =  getSharedPreferences("my_preferences", MODE_PRIVATE);
+        preferences.edit().putInt("selectedWeek", mViewPager.getCurrentItem()).apply();
         super.onDestroy();
     }
 
@@ -106,7 +109,9 @@ public class WeeklyListActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Log.d(LOG_TAG, "in on saveInstanceState");
         outState.putInt("episode_id", lastItemSelected);
+        outState.putInt("selected_week", mViewPager.getCurrentItem());
         super.onSaveInstanceState(outState);
     }
 
@@ -179,6 +184,16 @@ public class WeeklyListActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        selectedWeek = -1;
+        if (savedInstanceState != null) {
+            selectedWeek = savedInstanceState.getInt("selected_week");
+            mViewPager.setCurrentItem(selectedWeek);
+        }
+        if (selectedWeek == -1) {
+            mViewPager.setCurrentItem(preferences.getInt("selectedWeek", 0));
+        }
+
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -338,7 +353,7 @@ public class WeeklyListActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            Log.d("weeklyList", "in onCreateView");
+            Log.d(LOG_TAG, "in onCreateView");
 
 
             mEpisodeAdapters = new EpisodeAdapter(getActivity(), null, 0, cursorLoaderId, new EpisodeAdapter.EpisodeAdapterOnClickHandler() {
@@ -347,7 +362,7 @@ public class WeeklyListActivity extends AppCompatActivity {
                     //clear last selected
 //                    View lastSelected = mRecyclerView.getLayoutManager().findViewByPosition(lastItemPosition);
 //                    lastSelected.setActivated(false);
-                    lastItemPosition = position;
+//                    lastItemPosition = position;
                     lastItemSelected = podcastId;
 //                    vh.itemView.setActivated(true);
                     mEpisodeAdapters.notifyItemChanged(position);
@@ -383,7 +398,7 @@ public class WeeklyListActivity extends AppCompatActivity {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            Log.d("weeklyList", "in onCreateLoader");
+            Log.d(LOG_TAG, "in onCreateLoader");
             int weekPageNumber = cursorLoaderId;
             StringBuilder sb = new StringBuilder();
             if (favPodcastList != null) {
@@ -477,8 +492,10 @@ public class WeeklyListActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
+                    selectedWeek = 0;
                     return "This Week";
                 case 1:
+                    selectedWeek = 1;
                     return "Last Week";
             }
             return null;
