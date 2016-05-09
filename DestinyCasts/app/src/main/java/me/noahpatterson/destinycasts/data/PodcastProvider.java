@@ -43,7 +43,6 @@ public class PodcastProvider extends ContentProvider {
     @Override
     public boolean onCreate(){
         mOpenHelper = new PodcastDBHelper(getContext());
-
         return true;
     }
 

@@ -59,8 +59,6 @@ public class ChooseIntroActivity extends AppCompatActivity {
                 }
         });
 
-        //if saved favorites, load them, else create a new list
-//        List<Podcast> favoritePodcasts;
         if (podcastList != null) {
             favoritePodcasts = podcastList;
         } else {
@@ -127,7 +125,6 @@ public class ChooseIntroActivity extends AppCompatActivity {
     }
 
     private void storeSelectedPodcasts() {
-//        List podcastItems = podcastAdapter.getAllItems();
         Gson gson = new Gson();
         String jsonText = gson.toJson(favoritePodcasts);
         preferences.edit()

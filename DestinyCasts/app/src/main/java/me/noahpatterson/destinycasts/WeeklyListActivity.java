@@ -29,7 +29,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -89,8 +88,10 @@ public class WeeklyListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Log.d(LOG_TAG, "in onDestory");
-        SharedPreferences preferences =  getSharedPreferences("my_preferences", MODE_PRIVATE);
-        preferences.edit().putInt("selectedWeek", mViewPager.getCurrentItem()).apply();
+        if (mViewPager != null) {
+            SharedPreferences preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
+            preferences.edit().putInt("selectedWeek", mViewPager.getCurrentItem()).apply();
+        }
         super.onDestroy();
     }
 
@@ -147,18 +148,6 @@ public class WeeklyListActivity extends AppCompatActivity {
         favPodcastList = Utilities.getPodcastsFavorites(this, preferences);
 
         setContentView(R.layout.activity_weekly_list);
-        // Stetho is a tool created by facebook to view your database in chrome inspect.
-        // The code below integrates Stetho into your app. More information here:
-        // http://facebook.github.io/stetho/
-        Stetho.initialize(
-                Stetho.newInitializerBuilder(this)
-                        .enableDumpapp(
-                                Stetho.defaultDumperPluginsProvider(this))
-                        .enableWebKitInspector(
-                                Stetho.defaultInspectorModulesProvider(this))
-                        .build());
-
-        ///////////////
 
         //is this master detail layout?
         if (findViewById(R.id.player_detail_container) != null) {
