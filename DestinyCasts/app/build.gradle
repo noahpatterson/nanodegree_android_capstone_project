@@ -5,11 +5,9 @@ android {
     signingConfigs {
         config {
             keyAlias 'android_keystore'
-//            removed key password for github
-            keyPassword ''
+            keyPassword 'gobblygook'
             storeFile file("$rootDir/keystore.jks")
-//            removed store password for github
-            storePassword ''
+            storePassword 'gobblygook'
         }
     }
     compileSdkVersion 23
