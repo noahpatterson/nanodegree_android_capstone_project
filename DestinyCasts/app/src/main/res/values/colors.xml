@@ -4,4 +4,12 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="episode_list_selected">#999999</color>
+    <color name="widget_background">#999</color>
+    <color name="widget_episodeName">#000</color>
+    <color name="widget_podcastName">#000</color>
+    <color name="widget_divider">#000</color>
+    <color name="notification_background">#999</color>
+    <color name="notification_episodeName">#000</color>
+    <color name="notification_podcastName">#000</color>
+    <color name="notification_divider">#000</color>
 </resources>

@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/podcastImageView"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="@dimen/choose_podcastImage_width"
+        android:layout_height="@dimen/choose_podcastImage_height"
         android:scaleType="centerCrop"/>
 
     <TextView
@@ -15,9 +15,9 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_below="@id/podcastImageView"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:paddingTop="@dimen/choose_podcastTitle_paddingTop"
+        android:paddingBottom="@dimen/choose_podcastTitle_paddingBottom"
         android:singleLine="false"
-        android:textSize="18sp" />
+        android:textSize="@dimen/choose_podcastTitle_textSize" />
 </RelativeLayout>
 

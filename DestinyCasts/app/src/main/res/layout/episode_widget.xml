@@ -5,17 +5,17 @@
     android:id="@+id/widgetParent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#999"
+    android:background="@color/widget_background"
 
     >
 
     <ImageView
         android:id="@+id/episodeNotficationImageView"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
+        android:layout_width="@dimen/widget_image_width"
+        android:layout_height="@dimen/widget_image_height"
         android:scaleType="centerCrop"
         android:contentDescription="@string/episode_image"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         tools:src="@drawable/destiny_the_show"/>
 
 
@@ -24,12 +24,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text="April update is upon us"
-        android:textColor="#000"
-        android:layout_toRightOf="@id/episodeNotficationImageView"
-        android:paddingStart="8dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="8dp"
-        android:textSize="16sp"
+        android:textColor="@color/widget_episodeName"
+        android:layout_toEndOf="@id/episodeNotficationImageView"
+        android:paddingStart="@dimen/default_spacing"
+        android:paddingTop="@dimen/default_spacing"
+        android:paddingEnd="@dimen/default_spacing"
+        android:textSize="@dimen/widget_episodeName_textSize"
         android:text="@string/no_episode_for_widget"
         />
 
@@ -38,26 +38,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text="Destiny the Show"
-        android:textColor="#000"
+        android:textColor="@color/widget_podcastName"
         android:layout_below="@id/notificationEpisodeName"
-        android:layout_toRightOf="@id/episodeNotficationImageView"
-        android:paddingStart="8dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="4dp"
+        android:layout_toEndOf="@id/episodeNotficationImageView"
+        android:paddingStart="@dimen/default_spacing"
+        android:paddingTop="@dimen/half_default_spacing"
+        android:paddingEnd="@dimen/default_spacing"
+        android:paddingBottom="@dimen/half_default_spacing"
         />
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="1dip"
-        android:background="#000000"
+        android:layout_height="@dimen/widget_divider_height"
+        android:background="@color/widget_divider"
         android:layout_below="@id/notificationPodcastName"
-        android:layout_toRightOf="@id/episodeNotficationImageView"/>
+        android:layout_toEndOf="@id/episodeNotficationImageView"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/notificationPodcastName"
-        android:layout_toRightOf="@id/episodeNotficationImageView"
+        android:layout_toEndOf="@id/episodeNotficationImageView"
         android:gravity="center_horizontal"
         >
 

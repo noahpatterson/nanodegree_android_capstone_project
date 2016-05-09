@@ -25,8 +25,8 @@
         tools:text="Crucible Radio Ep. 42 - How to Prep for the April Update"
         android:textAlignment="center"
         android:textStyle="bold"
-        android:textSize="20sp"
-        android:padding="8dp"/>
+        android:textSize="@dimen/episodeList_title_textSize"
+        android:padding="@dimen/episodeList_title_padding"/>
 
     <TextView
         android:id="@+id/episodeDetailDate"
@@ -35,23 +35,23 @@
         tools:text="April 7"
         android:textAlignment="center"
         android:textStyle="bold"
-        android:textSize="16sp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
+        android:textSize="@dimen/episodeList_date_textSize"
+        android:paddingStart="@dimen/episodeList_date_paddingStart"
+        android:paddingEnd="@dimen/episodeList_date_paddingEnd"
         />
 
     <ScrollView android:id="@+id/episodeDescriptionScroller"
         android:layout_width="match_parent"
         android:layout_weight="2"
         android:layout_height="0dp"
-        android:padding="8dp"
+        android:padding="@dimen/episodeList_descriptionContainer_padding"
         android:scrollbars="vertical">
 
         <TextView
             android:id="@+id/episodeDetailDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="@dimen/episodeList_description_textSize"
             android:autoLink="all"
             android:linksClickable="true"
             tools:text="Description - a really long description about a podcast. This has a lot of text and I want to konw if it goes off the screen at some point. But we are about to wrap to a new line here. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come. Fun things to come.">
@@ -62,7 +62,7 @@
     <SeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="@dimen/default_spacing"
         android:id="@+id/playerSeekBar"
         />
 
@@ -71,9 +71,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="8dp"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
+        android:layout_marginBottom="@dimen/default_spacing"
+        android:paddingEnd="@dimen/default_spacing"
+        android:paddingStart="@dimen/default_spacing"
         >
         <TextView
             android:layout_width="wrap_content"
@@ -94,8 +94,8 @@
 
     <ImageButton
         android:contentDescription="@string/play_episode"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
+        android:layout_width="@dimen/episodeList_image_width"
+        android:layout_height="@dimen/episodeList_image_height"
         android:layout_gravity="center"
         android:id="@+id/playerPlayButton"
         android:src="@android:drawable/ic_media_play"

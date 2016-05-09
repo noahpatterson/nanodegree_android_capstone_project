@@ -11,17 +11,17 @@
 
         <ImageView
             android:id="@+id/episodeImageView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/weeklyEpisodeList_image_width"
+            android:layout_height="@dimen/weeklyEpisodeList_image_height"
             tools:src="@drawable/crucible_radio"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
+            android:paddingTop="@dimen/default_spacing"
+            android:paddingStart="@dimen/default_spacing"
+            android:paddingEnd="@dimen/default_spacing">
 
             <TextView
                 android:id="@+id/episodeTitleTextView"
@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:singleLine="true"
-                android:textSize="16sp"
+                android:textSize="@dimen/weeklyEpisodeList_title_textSize"
                 tools:text="Crucible Radio Ep. 42 - How to Prep for the April Update"/>
 
             <TextView
@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="April 7"
-                android:paddingBottom="4dp"/>
+                android:paddingBottom="@dimen/weeklyEpisodeList_date_paddingBottom"/>
 
             <TextView
                 android:id="@+id/episodeDescriptionTextView"

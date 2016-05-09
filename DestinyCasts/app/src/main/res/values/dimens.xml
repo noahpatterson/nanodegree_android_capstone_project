@@ -9,5 +9,53 @@
 Refer to App Widget Documentation for margin information
 http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     -->
+
+    <!-- defaults-->
+    <dimen name="default_spacing">8dp</dimen>
+    <dimen name="half_default_spacing">4dp</dimen>
+
+    <!-- choose intro activity-->
+    <dimen name="choose_gridview_columnWidth">150dp</dimen>
+    <dimen name="choose_gridview_verticalSpacing">10dp</dimen>
+    <dimen name="choose_gridview_horizontalSpacing">10dp</dimen>
+
+    <!-- weekly list activity tablet size-->
+    <dimen name="weeklyList_tablet_layout_marginTop">110dp</dimen>
+
+    <!-- episode -->
+    <dimen name="episodeList_title_textSize">20sp</dimen>
+    <dimen name="episodeList_title_padding">8dp</dimen>
+    <dimen name="episodeList_date_textSize">16sp</dimen>
+    <dimen name="episodeList_date_paddingStart">8dp</dimen>
+    <dimen name="episodeList_date_paddingEnd">8dp</dimen>
+    <dimen name="episodeList_descriptionContainer_padding">8dp</dimen>
+    <dimen name="episodeList_description_textSize">18sp</dimen>
+    <dimen name="episodeList_image_width">75dp</dimen>
+    <dimen name="episodeList_image_height">75dp</dimen>
+
+    <!-- weekly list activity episode-->
+    <dimen name="weeklyEpisodeList_image_width">100dp</dimen>
+    <dimen name="weeklyEpisodeList_image_height">100dp</dimen>
+    <dimen name="weeklyEpisodeList_title_textSize">16sp</dimen>
+    <dimen name="weeklyEpisodeList_date_paddingBottom">4dp</dimen>
+
+    <!-- widget-->
+    <dimen name="widget_image_width">75dp</dimen>
+    <dimen name="widget_image_height">75dp</dimen>
+    <dimen name="widget_episodeName_textSize">16sp</dimen>
+    <dimen name="widget_divider_height">1dip</dimen>
     <dimen name="widget_margin">8dp</dimen>
+
+    <!-- notification-->
+    <dimen name="notification_image_width">75dp</dimen>
+    <dimen name="notification_image_height">75dp</dimen>
+    <dimen name="notification_episodeName_textSize">16sp</dimen>
+    <dimen name="notification_divider_height">1dip</dimen>
+    <dimen name="notification_margin">8dp</dimen>
+    <dimen name="choose_podcastImage_width">150dp</dimen>
+    <dimen name="choose_podcastImage_height">150dp</dimen>
+    <dimen name="choose_podcastTitle_paddingTop">10dp</dimen>
+    <dimen name="choose_podcastTitle_paddingBottom">10dp</dimen>
+    <dimen name="choose_podcastTitle_textSize">18sp</dimen>
+
 </resources>
